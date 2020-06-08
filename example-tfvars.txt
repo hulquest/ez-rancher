@@ -1,0 +1,41 @@
+# ======================== #
+# VMware VMs configuration #
+# ======================== #
+
+vm-count = "2"
+vm-name = "rancher"
+vm-template-name = "bionic-server-cloudimg-amd64"
+vm-cpu = 2
+vm-ram = 4096
+vm-guest-id = "ubuntu64Guest"
+
+# ============================ #
+# VMware vSphere configuration #
+# ============================ #
+
+# VMware vCenter IP/FQDN
+vsphere-vcenter = "192.168.1.33"
+
+# VMware vSphere username used to deploy the infrastructure
+vsphere-user = ""
+
+# VMware vSphere password used to deploy the infrastructure
+vsphere-password = ""
+
+# Skip the verification of the vCenter SSL certificate (true/false)
+vsphere-unverified-ssl = "true"
+
+# vSphere datacenter name where the infrastructure will be deployed
+vsphere-datacenter = ""
+
+# vSphere cluster name where the infrastructure will be deployed
+vsphere-cluster = ""
+
+# vSphere Datastore used to deploy VMs 
+vm-datastore = ""
+
+# vSphere Network used to deploy VMs 
+vm-network = ""
+
+# Linux virtual machine domain name
+vm-domain = "example.local.net"

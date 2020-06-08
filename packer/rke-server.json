@@ -1,0 +1,166 @@
+{
+    "builders": [
+      {
+        "type": "vsphere-iso",
+  
+        "vcenter_server":      "{{user `vcenter_server`}}",
+        "username":"{{user `username`}}",
+        "password":"{{user `password`}}",
+        "cluster": "{{user `cluster`}}",
+        "network": "{{user `network`}}",
+        "resource_pool": "{{user `resource_pool`}}",
+        "datastore": "{{user `datastore`}}",
+        "insecure_connection": "true",
+
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_password": "{{user `ssh_password`}}",
+
+        "vm_name": "rke-ubuntu",
+        "convert_to_template": "true",
+        "boot_order": "disk,cdrom",
+  
+        "guest_os_type": "ubuntu64Guest",
+  
+        "CPUs":             1,
+        "RAM":              1024,
+        "RAM_reserve_all": true,
+  
+        "disk_controller_type":  "pvscsi",
+        "disk_size":        10737,
+        "disk_thin_provisioned": true,
+        "network_card": "vmxnet3",
+
+        "iso_urls": "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.4-server-amd64.iso",
+        "iso_checksum": "e2ecdace33c939527cbc9e8d23576381c493b071107207d2040af72595f8990b",
+        "iso_checksum_type": "sha256",
+
+        "floppy_files": [
+          "./http/preseed_server.cfg"
+        ],
+        "boot_command": [
+          "<enter><wait><f6><wait><esc><wait>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs>",
+          "/install/vmlinuz",
+          " initrd=/install/initrd.gz",
+          " priority=critical",
+          " locale=en_US",
+          " file=/media/preseed_server.cfg",
+          "<enter>"
+        ],
+        "boot_wait": "10s"
+      },
+      {
+        "type": "vmware-iso",
+        "vm_name": "rke-ubuntu",
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_password": "{{user `ssh_password`}}",
+
+        "disk_size":        10737,
+        "vmx_data": {
+          "config.version": "8",
+          "virtualHW.version": "13",
+          "ethernet0.virtualdev": "vmxnet3",
+          "ethernet1.virtualdev": "vmxnet3",
+          "memsize": "1024",
+          "numvcpus": "1"
+        },
+        "iso_url": "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.4-server-amd64.iso",
+        "iso_checksum": "e2ecdace33c939527cbc9e8d23576381c493b071107207d2040af72595f8990b",
+        "iso_checksum_type": "sha256",
+        "http_directory": "./http/",
+        "vnc_port_min": "6900",
+        "vnc_port_max": "6949",
+        "headless": true,
+        "vnc_disable_password": true,
+        "floppy_files": [
+          "./http/preseed_server.cfg"
+        ],
+        "boot_command": [
+          "<enter><wait><f6><wait><esc><wait>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs>",
+          "/install/vmlinuz",
+          " initrd=/install/initrd.gz",
+          " priority=critical",
+          " locale=en_US",
+          " file=/media/preseed_server.cfg",
+          "<enter>"
+        ],
+        "boot_wait": "10s",
+        "output_directory": "_output/vmware/"
+      }
+    ],
+    "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+      "scripts/vmtools.sh"
+      ],
+      "execute_command": "{{.Vars}} sudo -E -S bash '{{.Path}}'"
+    },
+    {
+      "scripts": [
+        "scripts/packages.sh",
+        "scripts/cloud-init.sh",
+        "scripts/bootloader.sh",
+        "scripts/network-config.sh",
+        "scripts/docker.sh",
+        "scripts/rke-install.sh",
+        "scripts/get_helm.sh"
+      ],
+      "type": "shell",
+      "pause_before": "10s",
+      "execute_command": "{{.Vars}} sudo -E -S bash '{{.Path}}'"
+    },
+    {
+      "type": "shell",
+      "inline": ["echo 'template build - start configuring ssh access'"]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p {{user `image_home_dir`}}{{user `ssh_username`}}/.ssh"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `ssh_key_src_pub`}}",
+      "destination": "{{user `image_home_dir`}}{{user `ssh_username`}}/.ssh/authorized_keys"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo chown -R {{user `ssh_username`}}:{{user `ssh_username`}} {{user `image_home_dir`}}{{user `ssh_username`}}",
+        "sudo chmod go-w {{user `image_home_dir`}}{{user `ssh_username`}}/",
+        "sudo chmod 700 {{user `image_home_dir`}}{{user `ssh_username`}}/.ssh",
+        "sudo chmod 600 {{user `image_home_dir`}}{{user `ssh_username`}}/.ssh/authorized_keys"
+        ]
+    },
+    {
+      "type": "shell",
+      "scripts": [
+      "scripts/cleanup.sh"
+      ],
+      "execute_command": "{{.Vars}} sudo -E -S bash '{{.Path}}'"
+    },
+    {
+      "type": "shell",
+      "inline": ["echo 'rke-ubuntu template build - complete'"]
+    }
+  ]
+}

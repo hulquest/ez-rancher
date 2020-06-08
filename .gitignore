@@ -1,5 +1,12 @@
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
+
+packer/variables.json
 # Cache objects
-packer_cache/
+packer/packer_cache/
 
 # Crash log
 crash.log
