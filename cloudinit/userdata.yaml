@@ -3,5 +3,9 @@ packages:
   - nfs-kernel-server
   - docker
   - docker.io
+  - curl
+  - wget
+  - git
 runcmd:
     - mkdir -p /mnt/sharedfolder
+    - usermod -aG docker ubuntu

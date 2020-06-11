@@ -29,6 +29,13 @@ variable "vsphere-cluster" {
   default     = ""
 }
 
+
+variable "vsphere-vm-folder" {
+  type        = string
+  description = "VM folder to create vms under"
+  default = ""
+}
+
 variable "vsphere-template-folder" {
   type        = string
   description = "Template folder"
@@ -94,4 +101,10 @@ variable "vm-domain" {
   type        = string
   description = "Domain name for the machine."
   default     = ""
+}
+
+variable "machine-cloud-init-dir" {
+  type        = string
+  description = "Path to local directory containing cloudinit files."
+  default     = "./cloudinit"
 }
