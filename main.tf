@@ -71,11 +71,28 @@ resource "vsphere_virtual_machine" "vm" {
 
 
   extra_config = {
-    "guestinfo.metadata"          = base64encode("${file("${path.module}/cloudinit//metadata.yaml")}")
+    "guestinfo.metadata"          = base64encode("${file("${path.module}/cloudinit/metadata.yaml")}")
     "guestinfo.metadata.encoding" = "base64"
     "guestinfo.userdata"          = base64encode("${file("${path.module}/cloudinit/userdata.yaml")}")
     "guestinfo.userdata.encoding" = "base64"
   }
+}
+
+output "node_ips" {
+  value = vsphere_virtual_machine.vm.*.default_ip_address
+}
+
+resource "time_sleep" "wait_cloudinit" {
+  depends_on = [vsphere_virtual_machine.vm[0]]
+  # 2m is probably excessive, but leave it for now
+  create_duration = "2m"
+}
+
+# We'd like to just use this as our wait for RKE deploy, but then we run into things like ssh keep-alive timeout
+# TODO: Look into modifying sshd config to use this instead of a dumb wait like we have above
+resource  "null_resource" "wait_cloud_init" {
+  depends_on = [time_sleep.wait_cloudinit]
+  count = var.vm-count
 
   provisioner "remote-exec" {
     inline = [
@@ -90,28 +107,22 @@ resource "vsphere_virtual_machine" "vm" {
 
 }
 
-output "node_ips" {
-  value = {
-    for v in vsphere_virtual_machine.vm:
-    v.name => v.default_ip_address
-  }
-}
-
 resource "rke_cluster" "cluster" {
+  depends_on = [null_resource.wait_cloud_init]
   nodes {
-    address = "${vsphere_virtual_machine.vm[0].default_ip_address}"
+    address = vsphere_virtual_machine.vm[0].default_ip_address
     user = "ubuntu"
     role = ["controlplane", "worker", "etcd"]
     ssh_key = file("~/.ssh/id_rsa")
   }
   nodes {
-    address = "${vsphere_virtual_machine.vm[1].default_ip_address}"
+    address = vsphere_virtual_machine.vm[1].default_ip_address
     user = "ubuntu"
     role = ["worker", "etcd"]
     ssh_key = file("~/.ssh/id_rsa")
   }
   nodes {
-    address = "${vsphere_virtual_machine.vm[2].default_ip_address}"
+    address = vsphere_virtual_machine.vm[2].default_ip_address
     user = "ubuntu"
     role = ["worker", "etcd"]
     ssh_key = file("~/.ssh/id_rsa")
