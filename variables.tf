@@ -108,3 +108,9 @@ variable "machine-cloud-init-dir" {
   description = "Path to local directory containing cloudinit files."
   default     = "./cloudinit"
 }
+
+variable "private-key-file" {
+  type        = string
+  description = "Path to local ssh private key file."
+  default     = "~/.ssh/id_rsa"
+}

@@ -77,27 +77,27 @@ resource "vsphere_virtual_machine" "vm" {
     "guestinfo.userdata.encoding" = "base64"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cloud-init status --wait"
+    ]
+    connection {
+      host = vsphere_virtual_machine.vm["${count.index}"].default_ip_address
+      type = "ssh"
+      user = "ubuntu"
+    }
+  }
+
 }
+
 output "node_ips" {
   value = {
     for v in vsphere_virtual_machine.vm:
     v.name => v.default_ip_address
   }
-  #value = "${vsphere_virtual_machine.vm[${count.index}].default_ip_address}"
-}
-
-# This is a temporary (I hope) hack to wait for cloudinit to get docker up and running 
-# before we try to connect and run the RKE deploy.  
-# The 3 minutes is excessive, might also be better offf just moving docker
-# install into a remote-exec resource and use that as our depends-on
-
-resource "time_sleep" "docker_startup" {
-  depends_on = [vsphere_virtual_machine.vm[2]]
-  create_duration = "1m"
 }
 
 resource "rke_cluster" "cluster" {
-  depends_on = [time_sleep.docker_startup]
   nodes {
     address = "${vsphere_virtual_machine.vm[0].default_ip_address}"
     user = "ubuntu"
