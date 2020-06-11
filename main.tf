@@ -132,4 +132,11 @@ resource "rke_cluster" "cluster" {
 resource "local_file" "kube_cluster_yaml" {
   filename = "${path.root}/kube_config_cluster.yml"
   content  = rke_cluster.cluster.kube_config_yaml
+
+  provisioner "local-exec" {
+    command = "kubectl create namespace cattle-system && kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.0/cert-manager.crds.yaml"
+    environment = {
+      KUBECONFIG="${path.root}/kube_config_cluster.yml"
+    }
+  }
 }
