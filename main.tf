@@ -78,8 +78,12 @@ resource "vsphere_virtual_machine" "vm" {
   }
 
 }
-output "ip" {
-  value = "${vsphere_virtual_machine.vm[0].default_ip_address}"
+output "node_ips" {
+  value = {
+    for v in vsphere_virtual_machine.vm:
+    v.name => v.default_ip_address
+  }
+  #value = "${vsphere_virtual_machine.vm[${count.index}].default_ip_address}"
 }
 
 # This is a temporary (I hope) hack to wait for cloudinit to get docker up and running 
@@ -89,7 +93,7 @@ output "ip" {
 
 resource "time_sleep" "docker_startup" {
   depends_on = [vsphere_virtual_machine.vm[2]]
-  create_duration = "3m"
+  create_duration = "1m"
 }
 
 resource "rke_cluster" "cluster" {
