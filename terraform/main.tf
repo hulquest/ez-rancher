@@ -6,7 +6,11 @@ provider "vsphere" {
   allow_unverified_ssl = var.vsphere-unverified-ssl
 }
 
-# Define vSphere settings 
+provider "helm" {
+  version = "1.2.2"
+}
+
+# Define vSphere settings
 data "vsphere_datacenter" "dc" {
   name = var.vsphere-datacenter
 }
@@ -31,6 +35,13 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
+data "template_file" "userdata" {
+  template = "${file("${path.module}/cloudinit/userdata2.yaml")}"
+  vars = {
+    ssh_public_key = file("/root/.ssh/id_rsa.pub")
+  }
+}
+
 # Provisoin VMs
 resource "vsphere_virtual_machine" "vm" {
   count = var.vm-count
@@ -49,9 +60,9 @@ resource "vsphere_virtual_machine" "vm" {
   }
 
   disk {
-    label = "${var.vm-name}-${count.index + 1}-disk"
+    label = "disk0"
     size  = 80
-    thin_provisioned = false
+    thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
   }
 
   cdrom {
@@ -65,7 +76,7 @@ resource "vsphere_virtual_machine" "vm" {
   vapp {
     properties ={
       hostname = "${var.vm-name}-${count.index + 1}"
-      user-data = base64encode(file("${path.module}/cloudinit/kickstart.yaml"))
+      user-data = base64encode("${data.template_file.userdata.rendered}")
     }
   }
 
@@ -102,6 +113,7 @@ resource  "null_resource" "wait_cloud_init" {
       host = vsphere_virtual_machine.vm["${count.index}"].default_ip_address
       type = "ssh"
       user = "ubuntu"
+      private_key = file("/root/.ssh/id_rsa")
     }
   }
 
@@ -130,6 +142,64 @@ resource "rke_cluster" "cluster" {
 }
 
 resource "local_file" "kube_cluster_yaml" {
-  filename = "${path.root}/kube_config_cluster.yml"
+  filename = "${path.root}/deliverables/kube_config_cluster.yml"
   content  = rke_cluster.cluster.kube_config_yaml
+}
+
+resource "local_file" "kubeconfig" {
+  filename = "/root/.kube/config"
+  content  = rke_cluster.cluster.kube_config_yaml
+}
+
+resource "local_file" "ssh_private_key" {
+  filename = "${path.root}/deliverables/id_rsa"
+  content  = file("~/.ssh/id_rsa")
+}
+
+resource "local_file" "ssh_public_key" {
+  filename = "${path.root}/deliverables/id_rsa.pub"
+  content  = file("~/.ssh/id_rsa.pub")
+}
+
+resource "helm_release" "cert-manager" {
+  depends_on = [local_file.kubeconfig]
+  name  = "cert-manager"
+  chart = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  namespace = "cert-manager"
+  create_namespace = "true"
+
+  set {
+    name  = "namespace"
+    value = "cert-manager"
+  }
+
+  set {
+    name  = "version"
+    value = "v0.15.0"
+  }
+
+  set {
+    name = "installCRDs"
+    value = "true"
+  }
+}
+
+resource "helm_release" "rancher" {
+  depends_on = [helm_release.cert-manager]
+  name  = "rancher"
+  chart = "rancher"
+  repository = "https://releases.rancher.com/server-charts/stable"
+  namespace = "cattle-system"
+  create_namespace = "true"
+
+  set {
+    name  = "namespace"
+    value = "cattle-system"
+  }
+
+  set {
+    name  = "hostname"
+    value = "my.rancher.org"
+  }
 }
