@@ -1,0 +1,50 @@
+name: Terraform
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  validate:
+    name: Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.12.26
+
+      - name: Terraform Format
+        run: terraform fmt -check -recursive -diff .
+
+      - name: Install RKE Provider
+        run: hack/gh_actions_install_rke_provider.sh
+
+      - name: Terraform Init
+        run: terraform init terraform/vsphere-rancher
+
+      - name: Validate
+        run: terraform validate terraform/vsphere-rancher
+
+  publish:
+    name: Publish Image
+    needs: validate
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'master' }}
+    steps:
+      - uses: actions/checkout@master
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: netapp/ez-rancher/terraform-rancher
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          dockerfile: Dockerfile
+          tags: "latest,${{ env.RELEASE_VERSION }}"
+
