@@ -8,8 +8,10 @@ If you're running locally without the docker container:
 * Terraform RKE plugin
 
 ## usage
-provsion some VMs and install RKE
+provsion some VMs and install RKE and Rancher Server
 `terraform apply`
 
-Finish it up by throwing rancher on top with helm
-`./finalize.sh`
+## as a Docker container
+`docker run -it --rm -v ${PWD}/terraform.tfvars:/terraform/terraform.tfvars -v ${PWD}/deliverables:/terraform/deliverables ez-rancher apply -state=deliverables/terraform.tfstate`
+
+# Releases will be published as container images in Github
