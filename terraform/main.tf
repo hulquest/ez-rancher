@@ -200,6 +200,6 @@ resource "helm_release" "rancher" {
 
   set {
     name  = "hostname"
-    value = "my.rancher.org"
+    value = var.vm-domain
   }
 }
