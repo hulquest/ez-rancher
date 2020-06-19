@@ -1,6 +1,15 @@
 terraform {
   required_version = ">= 0.12.0"
+  backend "local" {
+    path = "./deliverables/terraform.tfstate"
+  }
 }
+
+locals {
+  control_plane_ips = length(var.static-ip-addresses) == 0 ? [] : slice(var.static-ip-addresses, 0, var.control_plane_count)
+  worker_ips        = length(var.static-ip-addresses) == 0 ? [] : slice(var.static-ip-addresses, var.control_plane_count, var.worker_count + var.control_plane_count)
+}
+
 
 module "control_plane" {
   source = "../modules/infrastructure/vsphere"
@@ -19,6 +28,8 @@ module "control_plane" {
   vsphere-vm-folder      = var.vsphere-vm-folder
   vsphere-resource-pool  = var.vsphere-resource-pool
   ssh-public-key         = var.ssh-public-key
+  static-ip-addresses    = local.control_plane_ips
+  default-gateway        = var.default-gateway
 }
 
 module "worker" {
@@ -38,6 +49,8 @@ module "worker" {
   vsphere-vm-folder      = var.vsphere-vm-folder
   vsphere-resource-pool  = var.vsphere-resource-pool
   ssh-public-key         = var.ssh-public-key
+  static-ip-addresses    = local.worker_ips
+  default-gateway        = var.default-gateway
 }
 
 module "rancher" {

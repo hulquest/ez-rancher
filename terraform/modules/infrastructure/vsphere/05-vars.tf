@@ -118,3 +118,15 @@ variable "ssh-public-key" {
   description = "SSH public key"
   default     = "~/.ssh/id_rsa.pub"
 }
+
+variable "static-ip-addresses" {
+  type        = list
+  description = "List of IP addresses"
+  default     = []
+}
+
+variable "default-gateway" {
+  type        = string
+  description = "Default Gateway"
+  default     = ""
+}
