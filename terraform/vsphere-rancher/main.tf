@@ -19,6 +19,8 @@ module "control_plane" {
   vm_datastore           = var.vm_datastore
   vm_name                = var.vm_name
   vm_network             = var.vm_network
+  vm_cpu                 = var.vm_cpu
+  vm_ram                 = var.vm_ram
   vm_template_name       = var.vm_template_name
   vsphere_datacenter     = var.vsphere_datacenter
   vsphere_password       = var.vsphere_password
@@ -40,6 +42,8 @@ module "worker" {
   vm_datastore           = var.vm_datastore
   vm_name                = var.vm_name
   vm_network             = var.vm_network
+  vm_cpu                 = var.vm_cpu
+  vm_ram                 = var.vm_ram
   vm_template_name       = var.vm_template_name
   vsphere_datacenter     = var.vsphere_datacenter
   vsphere_password       = var.vsphere_password
