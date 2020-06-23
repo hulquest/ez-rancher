@@ -1,19 +1,3 @@
-variable "control_plane_ips" {
-  type = list(string)
-}
-
-variable "control_plane_names" {
-  type = list(string)
-}
-
-variable "worker_ips" {
-  type = list(string)
-}
-
-variable "worker_names" {
-  type = list(string)
-}
-
 variable "rancher_server_url" {
   type        = string
   description = "Rancher server-url"
@@ -35,4 +19,14 @@ variable "ssh_public_key" {
 variable "vm_depends_on" {
   type    = any
   default = null
+}
+
+variable "control_plane_nodes" {
+  type    = list
+  default = []
+}
+
+variable "worker_nodes" {
+  type    = list
+  default = []
 }
