@@ -1,9 +1,11 @@
 Makefile
 rancher.tfvars
 .terraform
+**/.terraform
 .github
 hack
 deliverables
+**/deliverables
 k8s
 .idea
 .git
