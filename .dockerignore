@@ -4,3 +4,6 @@ rancher.tfvars
 .github
 hack
 deliverables
+k8s
+.idea
+.git
