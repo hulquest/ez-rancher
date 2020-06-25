@@ -89,6 +89,11 @@ variable "rancher_server_url" {
   default     = "my.rancher.org"
 }
 
+variable "rancher_password" {
+  type    = string
+  default = "solidfire"
+}
+
 variable "ssh_private_key" {
   type        = string
   description = "SSH private key"
@@ -123,4 +128,29 @@ variable "dns_servers" {
   type        = list
   description = "List of DNS server IPv4 addresses"
   default     = ["1.1.1.1", "8.8.8.8"]
+}
+
+variable "rancher_create_user_cluster" {
+  type    = bool
+  default = false
+}
+
+variable "rancher_user_cluster_name" {
+  type    = string
+  default = ""
+}
+
+variable "rancher_user_cluster_cpu" {
+  type    = string
+  default = 2
+}
+
+variable "rancher_user_cluster_memoryMB" {
+  type    = string
+  default = 6144
+}
+
+variable "bootstrap_rancher" {
+  type    = string
+  default = false
 }

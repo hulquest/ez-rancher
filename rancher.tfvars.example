@@ -40,9 +40,6 @@ vm_domain = "example.org"
 # vSphere VM Folder
 vsphere_vm_folder = "your/folder"
 
-# rancher server-url
-rancher_server_url = "my.rancher.org"
-
 ssh_private_key = "~/.ssh/id_rsa"
 ssh_public_key = "~/.ssh/id_rsa.pub"
 vsphere_resource_pool = "mypool"
@@ -55,3 +52,26 @@ vsphere_resource_pool = "mypool"
 
 # (Optional) deliverables directory path. Defaults to ./deliverables
 # deliverables_path = "/deliverables"
+
+# ===================== #
+# Rancher configuration #
+# ===================== #
+
+# rancher server url
+# If bootstrap_rancher is enabled and DHCP is being used for hosts, 
+# this will be automatically overridden to <IP of first worker>.nip.io 
+rancher_server_url = "my.rancher.org"
+
+# Automatically configure rancher:
+# - Updates the default admin password, provided by the rancher_password variable.
+# - Enables telemetry 
+bootstrap_rancher = false
+
+# rancher default admin password
+rancher_password  = "solidfire"
+
+# Create a default user cluster. Requires bootstrap_rancher.
+rancher_create_user_cluster = false
+
+# Default user cluster name
+rancher_user_cluster_name  = "user-default"

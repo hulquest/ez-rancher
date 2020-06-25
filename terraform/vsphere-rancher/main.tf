@@ -65,8 +65,23 @@ module "rancher" {
   vm_depends_on       = [module.worker.nodes, module.control_plane.nodes]
   control_plane_nodes = module.control_plane.nodes
   worker_nodes        = module.worker.nodes
-  rancher_server_url  = var.rancher_server_url
+  rancher_server_url  = var.bootstrap_rancher ? length(local.control_plane_ips) == 0 ? join("", [module.worker.nodes[0].ip, ".nip.io"]) : var.rancher_server_url : var.rancher_server_url
   ssh_private_key     = var.ssh_private_key
   ssh_public_key      = var.ssh_public_key
-  deliverables_path   = var.deliverables_path
+
+  rancher_password    = var.rancher_password
+  create_user_cluster = var.rancher_create_user_cluster
+  user_cluster_name   = var.rancher_user_cluster_name
+
+  rancher_vsphere_username = var.vsphere_user
+  rancher_vsphere_password = var.vsphere_password
+  rancher_vsphere_server   = var.vsphere_vcenter
+  rancher_vsphere_port     = 443
+
+  rancher_vsphere_datacenter = var.vsphere_datacenter
+  rancher_vsphere_datastore  = var.vm_datastore
+  rancher_vsphere_folder     = var.vsphere_vm_folder
+  rancher_vsphere_network    = var.vm_network
+  rancher_vsphere_pool       = var.vsphere_resource_pool
+  bootstrap_rancher          = var.bootstrap_rancher
 }
