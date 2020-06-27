@@ -28,6 +28,6 @@ kubeadmConfigPatchesJSON6902:
       value: kind-control-plane
 EOF
 
-kind create cluster --config kind-config.yaml
+kind create cluster --config kind-config.yaml --image ${KIND_NODE_IMAGE}
 # be sure a docker volume is mounted to the location below so the kubeconfig can be shared with the HCC UI
 kind get kubeconfig > /kubeconfig/kubeconfig

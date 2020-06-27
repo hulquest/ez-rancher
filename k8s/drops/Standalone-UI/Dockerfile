@@ -22,5 +22,6 @@ COPY --from=builder /bin/docker /bin/docker
 
 ADD entrypoint.sh /entrypoint.sh
 ENV KIND_EXPERIMENTAL_DOCKER_NETWORK="kind"
+ENV KIND_NODE_IMAGE="kindest/node:v1.18.4"
 
 ENTRYPOINT ["/entrypoint.sh"]
