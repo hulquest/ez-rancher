@@ -1,5 +1,5 @@
 # docker build --force-rm -t kind-bootstrapper .
-# docker run -it --rm -e KIND_EXPERIMENTAL_DOCKER_NETWORK=internal -v /var/run/docker.sock:/var/run/docker.sock kind-bootstrapper create cluster
+# docker run -it --rm -e KIND_EXPERIMENTAL_DOCKER_NETWORK=internal -v /var/run/docker.sock:/var/run/docker.sock kind-bootstrapper
 FROM alpine:3.12.0 as builder
 
 ENV KIND_VERSION=v0.8.1
