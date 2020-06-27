@@ -1,0 +1,19 @@
+# docker-compose up --build
+version: "3.3"
+services:
+  kind-bootstrapper:
+    image: kind-bootstrapper:latest
+    build: .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - Kubeconfig:/kubeconfig
+  # hcc-ui:
+  #  image: sf-artifactory.solidfire.net:9000/hcc-ui:3.3.138 # this will be the image Cole provides. It will need to read the kubeconfig from the volume mount for communicated with the kind cluster
+  #  volumes:
+  #    - Kubeconfig:/kubeconfig
+  #  depends_on:
+  #    - kind-bootstrapper
+
+volumes:
+  Kubeconfig:
+    external: true

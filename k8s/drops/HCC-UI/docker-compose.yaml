@@ -1,0 +1,52 @@
+# this is an example of what would be needed to integrate with mnode
+version: "3.3"
+services:
+  docker-proxy:
+    image: docker-proxy:2.1.4
+    build: docker-proxy
+    networks:
+      - internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SERVICES=1
+      - SERVICES_POST=1
+      - CONTAINERS=1
+      - CONTAINERS_POST=1
+      - CONTAINERS_DELETE=1
+      - IMAGES=1
+      - IMAGES_POST=1
+      - VOLUMES=1
+      - VOLUMES_POST=1
+      - LOGS=1
+      - NETWORKS=1
+      - EXEC=1
+      - EXEC_POST=1 # this var requires a modification to mnode's docker-socket-proxy
+  kind-bootstrapper: # see the Standalone-UI directory for the Dockerfile to build kind-bootstrapper
+    image: kind-bootstrapper:latest
+    build: ../Standalone-UI
+    depends_on:
+      - docker-proxy
+    networks:
+      - internal
+    volumes:
+      - Kubeconfig:/kubeconfig
+    environment:
+      - DOCKER_HOST=tcp://docker-proxy:2375
+      # - KIND_EXPERIMENTAL_DOCKER_NETWORK=internal # if needed. the kind container shouldnt be routed through nginx in my opinion. lets push the a better architecture forward.
+  #hcc-ui:
+  #  image: sf-artifactory.solidfire.net:9000/hcc-ui:3.3.138
+  #  volumes:
+  #    - Kubeconfig:/kubeconfig # read the kubeconfig from here, UI need to read it in and then modify it (server: "https://<mnode public ip>:38099") so that the IP/hostname is the mnode's public IP. Leave the randomly generated port (from kind) as is.
+  #  depends_on:
+  #    - kind-bootstrapper
+  #  networks:
+  #    - internal
+
+networks:
+  internal:
+    attachable: true
+
+volumes:
+  Kubeconfig:
+    external: true

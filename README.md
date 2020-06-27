@@ -1,6 +1,9 @@
 # Terraform Rancher
 Terraform to deploy Rancher server on vSphere
 
+# Releases
+Please check the [releases](https://github.com/NetApp/ez-rancher/releases) page.
+
 ## Requirements
 If you're running locally:
 * [Terraform](https://www.terraform.io/downloads.html) >= 0.12
@@ -8,7 +11,8 @@ If you're running locally:
 * [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
 * netcat
 
-## Usage
+## Getting Started
+For tfvars config file examples, refer to [tfvars examples](docs/TfvarsExamples.md)
 
 #### Local
 ```bash
