@@ -10,15 +10,18 @@ Terraform Rancher can either be ran directly using the terraform CLI with the re
 ## Requirements
 
 There are 2 ways to run Terraform Rancher:
+1. Terraform CLI 
 
-### Terraform CLI 
-* [Terraform](https://www.terraform.io/downloads.html) >= 0.12
-* [Kubectl](https://downloadkubernetes.com/)
-* [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
-* netcat
+    You have a working Terraform environment with the following dependencies:
+    * [Terraform](https://www.terraform.io/downloads.html) >= 0.12
+    * [Kubectl](https://downloadkubernetes.com/)
+    * [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
+    * netcat
 
-### Docker container
-* [Docker](https://docs.docker.com/engine)
+2. Docker container
+
+    You have a working Docker environment:
+    * [Docker](https://docs.docker.com/engine)
 
 ### vSphere
 
