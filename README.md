@@ -1,18 +1,41 @@
 # Terraform Rancher
-Terraform to deploy Rancher server on vSphere
 
+----
+
+Terraform Rancher is Infrastructure as Code to deploy Rancher server on vSphere. It creates the VM infrastructure and configures [Rancher server](https://rancher.com/docs/rancher/v2.x/en/overview/). 
+
+Terraform Rancher can either be ran directly using the terraform CLI with the required dependencies or simply running the provided docker container.
+
+----
 ## Requirements
-Network connectivity from where terraform is executed to the vm_network
 
-If you're running locally:
+There are 2 ways to run Terraform Rancher:
+
+### Terraform CLI 
 * [Terraform](https://www.terraform.io/downloads.html) >= 0.12
 * [Kubectl](https://downloadkubernetes.com/)
 * [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
 * netcat
 
+### Docker container
+* [Docker](https://docs.docker.com/engine)
+
+### vSphere
+
+#### VM template
+The 'vm_template_name' must be a cloud-init OVA that is in your vCenter instance. We have tested this Ubuntu image: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.ova
+
+### Network
+Network connectivity from where terraform is executed to the vm_network. The vm_network must also have internet access.
+
+#### DNS
+The `rancher_server_url` input must resolve to one of the worker node IPs. 
+
+If DHCP is used (default), this can be done after the deployment completes and the worker nodes recieve an IP from the `vm_network`. 
+
 ## Usage
 
-#### Local
+#### Terraform CLI
 ```bash
 # create cluster
 terraform apply -var-file=rancher.tfvars terraform/vsphere-rancher
