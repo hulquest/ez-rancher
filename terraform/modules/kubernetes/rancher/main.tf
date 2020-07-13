@@ -1,5 +1,6 @@
 locals {
-  deliverables_path = var.deliverables_path == "" ? "./deliverables" : var.deliverables_path
+  deliverables_path  = var.deliverables_path == "" ? "./deliverables" : var.deliverables_path
+  alias_initial_node = var.rancher_server_url == join("", [var.cluster_nodes[0].ip, ".nip.io"]) ? 1 : 0
 }
 
 resource "rke_cluster" "cluster" {
@@ -7,7 +8,7 @@ resource "rke_cluster" "cluster" {
   # 2 minute timeout specifically for rke-network-plugin-deploy-job but will apply to any addons
   addon_job_timeout = 120
   dynamic "nodes" {
-    for_each = [for node in var.control_plane_nodes : {
+    for_each = [for node in var.cluster_nodes : {
       name = node["name"]
       ip   = node["ip"]
     }]
@@ -15,21 +16,7 @@ resource "rke_cluster" "cluster" {
       address           = nodes.value.ip
       hostname_override = nodes.value.name
       user              = "ubuntu"
-      role              = ["controlplane", "etcd"]
-      ssh_key           = file(var.ssh_private_key)
-    }
-  }
-
-  dynamic "nodes" {
-    for_each = [for node in var.worker_nodes : {
-      name = node["name"]
-      ip   = node["ip"]
-    }]
-    content {
-      address           = nodes.value.ip
-      hostname_override = nodes.value.name
-      user              = "ubuntu"
-      role              = ["worker"]
+      role              = ["controlplane", "etcd", "worker"]
       ssh_key           = file(var.ssh_private_key)
     }
   }
@@ -71,6 +58,7 @@ resource "helm_release" "cert-manager" {
   repository       = "https://charts.jetstack.io"
   namespace        = "cert-manager"
   create_namespace = "true"
+  wait             = "true"
 
   set {
     name  = "namespace"
@@ -88,8 +76,14 @@ resource "helm_release" "cert-manager" {
   }
 }
 
+resource "time_sleep" "wait_for_cert_manager" {
+  depends_on = [helm_release.cert-manager]
+
+  create_duration = "30s"
+}
+
 resource "helm_release" "rancher" {
-  depends_on       = [helm_release.cert-manager]
+  depends_on       = [helm_release.cert-manager, time_sleep.wait_for_cert_manager]
   name             = "rancher"
   chart            = "rancher"
   repository       = "https://releases.rancher.com/server-charts/stable"
@@ -104,6 +98,11 @@ resource "helm_release" "rancher" {
   set {
     name  = "hostname"
     value = var.rancher_server_url
+  }
+
+  set {
+    name  = "ingress.extraAnnotations.nginx\\.ingress\\.kubernetes\\.io/server-alias"
+    value = join(" ", formatlist("%s.nip.io", [for node in slice(var.cluster_nodes, local.alias_initial_node, length(var.cluster_nodes)) : node["ip"]]))
   }
 
 }

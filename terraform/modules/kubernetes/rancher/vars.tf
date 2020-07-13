@@ -32,12 +32,7 @@ variable "deliverables_path" {
   default     = "./deliverables"
 }
 
-variable "control_plane_nodes" {
-  type    = list
-  default = []
-}
-
-variable "worker_nodes" {
+variable "cluster_nodes" {
   type    = list
   default = []
 }
@@ -110,4 +105,9 @@ variable "rancher_vsphere_network" {
 variable "rancher_vsphere_pool" {
   type    = string
   default = ""
+}
+
+variable "rancher_node_template_disk_size" {
+  type    = number
+  default = 51200
 }

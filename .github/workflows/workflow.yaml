@@ -1,21 +1,32 @@
-name: Terraform Validate and Test
+name: Validate and Deploy
 
 on:
-  pull_request:
-    branches:
-    - main
   push:
     paths:
     - 'terraform/**'
     - '.github/workflows/workflow.yaml'
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (Optional)    
+        required: false
+  schedule:
+    - cron: '45 * * * *'
 
 jobs:
   validate:
-    name: Validate
-    runs-on: ez-rancher
+    name: Validate Terraform
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+        if: github.event.inputs.git-ref == ''
+
+      - name: Clone Repository (Custom Ref)
+        uses: actions/checkout@v2
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -35,14 +46,20 @@ jobs:
         run: terraform validate
         working-directory: ./terraform/vsphere-rancher
 
-      - name: Generate SSH Keys
-        run: |
-          rm -f ~/.ssh/id_rsa*
-          ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
+  docker-deploy:
+    name: Docker Deploy - DHCP
+    runs-on: docker
+    needs: validate
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - name: Build image
+        run: sudo docker build -t terraform-rancher:latest .
 
-      - name: Deploy Test Env
-        working-directory: ./terraform/vsphere-rancher
+      - name: Create vars file
         env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
           TF_VAR_control_plane_count: 1
           TF_VAR_worker_count: 2
           TF_VAR_vm_template_name: bionic-server-cloudimg-amd64
@@ -60,29 +77,37 @@ jobs:
           TF_VAR_bootstrap_rancher: true
           TF_VAR_vsphere_resource_pool: ${{ secrets.TF_VSPHERE_RESOURCE_POOL }}
         run: |
-          COMMIT_ID=$(git rev-parse --short HEAD)
-          terraform apply -input="false" -auto-approve -var="vm_name=${COMMIT_ID}"
+          export COMMIT_ID=$(echo $GITHUB_CONTEXT | jq -r '.sha' | cut -c1-7)
+          mkdir deliverables-$COMMIT_ID
+          env | grep TF_ > env.list
+          echo TF_VAR_vm_name=$COMMIT_ID >> env.list
 
-      - name: Cleanup Test Env
+      - name: Plan
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          COMMIT_ID=$(echo $GITHUB_CONTEXT | jq -r '.sha' | cut -c1-7)        
+          sudo docker run --rm -v `pwd`/deliverables-$COMMIT_ID:/terraform/vsphere-rancher/deliverables \
+            --env-file env.list \
+            terraform-rancher:latest plan -input="false"
+
+      - name: Deploy
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          COMMIT_ID=$(echo $GITHUB_CONTEXT | jq -r '.sha' | cut -c1-7)
+          sudo docker run --rm -v `pwd`/deliverables-$COMMIT_ID:/terraform/vsphere-rancher/deliverables \
+            --env-file env.list \
+            terraform-rancher:latest apply -input="false" -auto-approve         
+
+      - name: Destroy
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         if: ${{ always() }}
-        env:
-          TF_VAR_control_plane_count: 1
-          TF_VAR_worker_count: 2
-          TF_VAR_vm_template_name: bionic-server-cloudimg-amd64
-          TF_VAR_vsphere_vcenter: ${{ secrets.TF_VSPHERE_VCENTER }}
-          TF_VAR_vsphere_user: ${{ secrets.TF_VSPHERE_USER }}
-          TF_VAR_vsphere_password: ${{ secrets.TF_VSPHERE_PASSWORD }}
-          TF_VAR_vsphere_unverified_ssl: true
-          TF_VAR_vsphere_datacenter: ${{ secrets.TF_VSPHERE_DATACENTER }}
-          TF_VAR_vm_datastore: ${{ secrets.TF_VM_DATASTORE }}
-          TF_VAR_vm_network: ${{ secrets.TF_VM_NETWORK }}
-          TF_VAR_vsphere_vm_folder: ${{ secrets.TF_VSPHERE_VM_FOLDER }}
-          TF_VAR_vm_domain: example.net
-          TF_VAR_rancher_server_url: ${{ secrets.TF_RANCHER_SERVER_URL }}
-          TF_VAR_rancher_password: ${{ secrets.TF_RANCHER_PASSWORD }}
-          TF_VAR_bootstrap_rancher: true
-          TF_VAR_vsphere_resource_pool: ${{ secrets.TF_VSPHERE_RESOURCE_POOL }}
-        working-directory: ./terraform/vsphere-rancher
         run: |
-          COMMIT_ID=$(git rev-parse --short HEAD)
-          terraform destroy -input="false" -auto-approve -var="vm_name=${COMMIT_ID}"
+          COMMIT_ID=$(echo $GITHUB_CONTEXT | jq -r '.sha' | cut -c1-7)
+          sudo docker run --rm -v `pwd`/deliverables-$COMMIT_ID:/terraform/vsphere-rancher/deliverables \
+            --env-file env.list \
+            terraform-rancher:latest destroy -input="false" -auto-approve
+
+          

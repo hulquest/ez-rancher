@@ -2,12 +2,6 @@
 # VMware VMs configuration #
 # ======================== #
 
-# (Optional) number of control plane nodes in the kubernetes cluster. Defaults to 1
-control_plane_count = "1"
-
-# (Optional) number of worker nodes in the kubernetes cluster. Defaults to 2
-worker_count        = "2"
-
 # Name that all VMs will be prefixed with
 vm_name             = "rancher"
 
@@ -73,12 +67,14 @@ ssh_public_key = "~/.ssh/id_rsa.pub"
 
 # Rancher server URL
 # If bootstrap_rancher is enabled and DHCP is being used for hosts, 
-# this will be automatically overridden to <IP of first worker>.nip.io 
+# this will be automatically overridden to <IP of first node>.nip.io 
 rancher_server_url = "my.rancher.org"
 
 # Automatically configure rancher:
 # - Updates the default admin password, provided by the rancher_password variable.
 # - Enables telemetry 
+# - Creates cloud credentials for vCenter
+# - Creates node template for vCenter
 bootstrap_rancher = false
 
 # rancher default admin password
