@@ -17,3 +17,11 @@ validate:  ## Validate terraform
 .PHONY: fmt
 fmt:  ## Fixes formatting
 	terraform fmt -write=true -recursive -diff .
+
+.PHONY: dockerized-terraform-apply
+dockerized-terraform-apply: ## Executes terraform apply command with default arguments
+	hack/runner.sh apply
+
+.PHONY: dockerized-terraform-destroy
+dockerized-terraform-destroy: ## Executes terraform destroy command with default arguments
+	hack/runner.sh destroy

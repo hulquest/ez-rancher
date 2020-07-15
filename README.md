@@ -62,10 +62,17 @@ terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
 #### Docker
 ```bash
 make image
-# create cluster
-docker run -it --rm -v ${PWD}/rancher.tfvars:/terraform/vsphere-rancher/terraform.tfvars -v ${PWD}/deliverables:/terraform/vsphere-rancher/deliverables terraform-rancher apply -state=deliverables/terraform.tfstate
-# remove cluster
-docker run -it --rm -v ${PWD}/rancher.tfvars:/terraform/vsphere-rancher/terraform.tfvars -v ${PWD}/deliverables:/terraform/vsphere-rancher/deliverables terraform-rancher destroy -state=deliverables/terraform.tfstate
+
+# create cluster using default arguments
+make dockerized-terraform-apply
+# create cluster using custom arguments
+sh hack/runner.sh apply <path_to_tfvars_file> <path_to_deliverables_directory> 
+
+# remove cluster using default arguments
+make dockerized-terraform-destroy
+# remove cluster using custom arguments
+sh hack/runner.sh destroy <path_to_tfvars_file> <path_to_deliverables_directory> 
+
 ```
 
 or
