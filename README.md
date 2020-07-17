@@ -60,30 +60,28 @@ terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
 ```
 
 #### Docker
+
+We rely on environment variables for setting image tags, pointing to rancher variables files and providing
+a directory to put deployment output/deliverables in:
+* IMAGE_TAG (default is `dev`)
+* ER_VARS_FILE (default is `./rancher.tfvars`) 
+* ER_DELIVERABLES_DIR (default is `./deliverables`, will attempt creation if it doesn't exist)
 ```bash
 make image
 
 # create cluster using default arguments
-make dockerized-terraform-apply
-# create cluster using custom arguments
-sh hack/runner.sh apply <path_to_tfvars_file> <path_to_deliverables_directory> 
+make rancher-up
 
 # remove cluster using default arguments
-make dockerized-terraform-destroy
-# remove cluster using custom arguments
-sh hack/runner.sh destroy <path_to_tfvars_file> <path_to_deliverables_directory> 
+make rancher-destroy
 
 ```
 
-or
+*NOTE*
 
-```bash
-make shell
-# create cluster
-terraform apply -var-file=terraform.tfvars -state=deliverables/terraform.tfstate
-# remove cluster
-terraform destroy -var-file=terraform.tfvars -state=deliverables/terraform.tfstate
-```
+The `make rancher-destroy` directive will not only tear down a cluster deployed with `make cluster-up` but it will
+also clean up/remove the deliverables files generated from that run.  As such, if for some reason you'd like to save
+files from a previous run you'll want to copy them to another location.
 
 ## Releases
 
@@ -101,6 +99,11 @@ based on the current status of your src directory.
 By default we set an Image Tag of "dev" eg terraform-rancher:dev.  You can
 change this tag by setting the `IMAGE_TAG` environment variable to your
 desired tag (eg `latest` which we build and publish for each commit).
+
+When building container images, keep in mind that the `make build` option includes
+a helper script to gather the current git commit sha and places that file in the
+conatiner image that's built.  This provides a mechanism to determine the current
+git state of tagged builds that are in use.
 
 ## Pushing images to a container registry
 After building your image, you can also easily push it to your container
