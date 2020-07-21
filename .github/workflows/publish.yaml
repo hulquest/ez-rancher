@@ -26,4 +26,4 @@ jobs:
           registry: docker.io
           dockerfile: Dockerfile
           buildargs: GIT_COMMIT=${{ env.GIT_COMMIT }}
-          tags: "${{ env.RELEASE_VERSION }}"
+          tags: "latest, ${{ env.RELEASE_VERSION }}"
