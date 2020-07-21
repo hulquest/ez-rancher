@@ -27,6 +27,6 @@ PROJECT_DIR="$(
 
 cd $PROJECT_DIR
 echo "starting docker build process..."
-docker build -t terraform-rancher:${IMAGE_TAG} --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+docker build -t ez-rancher:${IMAGE_TAG} --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
 cd $CWD
 
