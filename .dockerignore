@@ -9,3 +9,5 @@ deliverables
 k8s
 .idea
 .git
+
+!hack/compress_binaries.sh
