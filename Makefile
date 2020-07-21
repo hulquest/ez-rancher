@@ -21,8 +21,7 @@ push: ## Push a Container image (ez-rancher:$EZR_IMAGE_TAG) to the specified reg
 shell:  ## Drop into a docker shell with terraform (used for debug and development purposes, shell access may be removed from the container in the future)
 	docker run -it --rm -v ${PWD}/rancher.tfvars:/terraform/vsphere-rancher/terraform.tfvars \
 	       -v ${PWD}/deliverables:/terraform/vsphere-rancher/deliverables --entrypoint /bin/sh \
-		   ${EZR_IMAGE_NAME}:${EZR_IMAGE_TAG}
-	true
+		   ${EZR_IMAGE_NAME}:${EZR_IMAGE_TAG} || true
 
 .PHONY: validate
 validate:  ## Validate terraform
