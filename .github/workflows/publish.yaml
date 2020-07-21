@@ -1,7 +1,7 @@
 name: Publish to Registry
 on:
   release:
-    types: [published, created, edited, released]
+    types: [published, created, edited, released, prereleased]
 
 jobs:
   publish:
