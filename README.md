@@ -64,9 +64,9 @@ terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
 We rely on environment variables for setting image tags, pointing to rancher variables files and providing
 a directory to put deployment output/deliverables in:
 
-* IMAGE_TAG (default is `dev`)
-* ER_VARS_FILE (default is `./rancher.tfvars`) 
-* ER_DELIVERABLES_DIR (default is `./deliverables`, will attempt creation if it doesn't exist)
+* EZR_IMAGE_TAG (default is `dev`)
+* EZR_VARS_FILE (default is `./rancher.tfvars`) 
+* EZR_DELIVERABLES_DIR (default is `./deliverables`, will attempt creation if it doesn't exist)
 
 ```bash
 make build
@@ -109,7 +109,7 @@ container image with all the necessary dependencies.  This will be built
 based on the current status of your src directory.
 
 By default, we set an Image Tag of "dev" eg ez-rancher:dev.  You can
-change this tag by setting the `IMAGE_TAG` environment variable to your
+change this tag by setting the `EZR_IMAGE_TAG` environment variable to your
 desired tag (eg `latest` which we build and publish for each commit).
 
 When building container images, keep in mind that the `make build` option includes
@@ -141,7 +141,7 @@ set this environment variable to your own DockerHub account as well as
 quay, or gcr and push dev builds to your own registry if you like by running
 `make push`.
 
-The `push` directive honors both the `IMAGE_TAG` env variable and the `REGISTRY`
+The `push` directive honors both the `EZR_IMAGE_TAG` env variable and the `REGISTRY`
 env variable.
 
 ## Verifying the Installation
