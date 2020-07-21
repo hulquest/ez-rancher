@@ -8,6 +8,7 @@ LABEL git_commit=$GIT_COMMIT
 ENV KUBECTL_VERSION=v1.18.3
 ENV RKE_PROVIDER_VERSION=1.0.1
 ENV TERRAFORM_VERSION=0.12.26
+ENV TERRAGRUNT_VERSION=v0.23.31
 
 RUN apk add --no-cache curl \
   && apk add --no-cache --virtual .build-deps openssh-client \
@@ -25,9 +26,14 @@ RUN apk add --no-cache curl \
   && rm -rf terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
   && mv terraform /bin/terraform
 
+RUN curl -Lo /bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64 && \
+  chmod +x /bin/terragrunt
+
 COPY terraform/ /terraform/
 
 WORKDIR /terraform/vsphere-rancher
-RUN terraform init
 
-ENTRYPOINT ["terraform"]
+RUN touch terragrunt.hcl
+RUN terragrunt init
+
+ENTRYPOINT ["terragrunt"]
