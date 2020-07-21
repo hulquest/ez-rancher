@@ -23,5 +23,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASS }}
           registry: docker.io
           dockerfile: Dockerfile
-          buildargs: GIT_COMMIT="${{ env.GIT_COMMIT }}"
-          tags: "${{ env.GITHUB_REF }}"
+          buildargs: GIT_COMMIT=${{ env.GIT_COMMIT }}
+          tags: "latest, ${{ env.RELEASE_VERSION }}"
