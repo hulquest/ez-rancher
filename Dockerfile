@@ -28,8 +28,7 @@ RUN apk add --no-cache --virtual .build-deps curl \
   && mv terraform /bin/terraform \
   && apk del --no-cache .build-deps \
   && rm -rf /tf-provider-rke.zip \
-  && /install_upx.sh \
-  && if ${EZR_COMPRESS_BINARIES}; then /compress_binaries.sh; fi
+  && if ${EZR_COMPRESS_BINARIES}; then /install_upx.sh; /compress_binaries.sh; fi
 
 COPY terraform/ /terraform/
 

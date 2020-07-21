@@ -124,7 +124,7 @@ $ docker inspect ez-rancher:dev  | jq '.[].ContainerConfig.Labels'
 }
 ```
 
-A container image with an over 70% smaller size can be created by setting the environment variable `EZR_COMPRESS_BINARIES` to `true`. This will compress `terraform`, `kubectl` and all plugin binaries.
+A container image over 70% smaller can be created by setting the environment variable `EZR_COMPRESS_BINARIES` to `true`. This will compress `terraform`, `kubectl` and all Terraform plugin binaries.
 
 ```bash
 export EZR_COMPRESS_BINARIES=true; make build
