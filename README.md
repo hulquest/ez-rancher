@@ -136,12 +136,12 @@ NOTE - *Be advised that with `EZR_COMPRESS_BINARIES=true` the image build proces
 
 After building your image, you can also easily push it to your container
 registry using the Makefile.  By default, we set a container registry
-environment variable ($REGISTRY) to `index.docker.io/netapp`.  You can
+environment variable ($EZR_REGISTRY) to `index.docker.io/netapp`.  You can
 set this environment variable to your own DockerHub account as well as
 quay, or gcr and push dev builds to your own registry if you like by running
 `make push`.
 
-The `push` directive honors both the `EZR_IMAGE_TAG` env variable and the `REGISTRY`
+The `push` directive honors both the `EZR_IMAGE_TAG` env variable and the `EZR_REGISTRY`
 env variable.
 
 ## Verifying the Installation
