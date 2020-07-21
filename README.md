@@ -10,20 +10,18 @@ EZ Rancher can either be ran directly using the terraform CLI with the required 
 
 ## Requirements
 
-There are 2 ways to run Terraform Rancher:
+There are 2 ways to run EZ-Rancher:
+1. Docker container (Recommended)
 
-1. Terraform CLI
+    You have a working Docker environment:
+    * [Docker](https://docs.docker.com/engine)
+2. Terraform CLI 
 
     You have a working Terraform environment with the following dependencies:
     * [Terraform](https://www.terraform.io/downloads.html) >= 0.12
     * [Kubectl](https://downloadkubernetes.com/)
     * [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
     * netcat
-
-2. Docker container
-
-    You have a working Docker environment:
-    * [Docker](https://docs.docker.com/engine)
 
 ### vSphere
 
@@ -43,7 +41,7 @@ If DHCP is used (default), this can be done after the deployment completes and t
 
 **Supplemental DNS names**
 
-The Rancher service is also accessible via **\<node ip address>.nip.io** for each node in the cluster. This provides additional hostnames that can be used to access the rancher service in the event of a node failure, or simply for convenience.
+See [Automatic DNS names](#automatic-dns-names)
 
 ## Getting Started
 
@@ -89,6 +87,7 @@ files from a previous run you'll want to copy them to another location.
 
 ### Deliverables
 ez-rancher will create several files based on the `deliverables_path` variable to save things like the kubeconfig, ssh keys, etc
+* See [Admin Access to Cluster Nodes](#admin-access-to-cluster-nodes) for more details.
 
 #### Node Access
 ez-rancher will generate an SSH key pair for RKE node communication. The generated key pair will be saved to the `deliverables_path` directory.
@@ -144,3 +143,60 @@ quay, or gcr and push dev builds to your own registry if you like by running
 
 The `push` directive honors both the `IMAGE_TAG` env variable and the `REGISTRY`
 env variable.
+
+## Verifying the Installation
+
+After installation, the some information will be displayed about your installation:
+```bash
+Outputs:
+
+cluster_nodes = [
+  {
+    "ip" = "10.1.1.2"
+    "name" = "my-node01"
+  },
+  {
+    "ip" = "10.1.1.3"
+    "name" = "my-node02"
+  },
+  {
+    "ip" = "10.1.1.4"
+    "name" = "my-node03"
+  },
+]
+rancher_server_url = https://<Your Rancher URL>
+```
+
+## Accessing the Rancher UI
+
+In order to access the Rancher UI via your chosen `rancher_server_url`, you must ensure that a valid DNS record exists, that resolves to one or more of your cluster node IPs.
+
+Once the DNS record is in place, the Rancher UI will become accessible at the location specified for `rancher_server_url`.
+
+#### Automatic DNS Names
+
+If you have not yet configured DNS (or prefer not to), the Rancher UI can also be accessed via the following URL syntax, using the IP address of any node in the cluster:
+```bash
+https://<IP of node>.nip.io
+```
+
+## Admin Access to Cluster Nodes
+
+If desired, administrative access to the cluster nodes is possible via the following methods:
+
+### Kubectl
+Access to the K8S cluster on which Rancher is running can be performed by configuring `kubectl` to use the config file located at `deliverables/kubeconfig`:
+```bash
+$ export KUBECONFIG=`pwd`/deliverables/kubeconfig
+$ kubectl get nodes
+NAME             STATUS   ROLES              AGE     VERSION
+node01   Ready    controlplane,etcd,worker   5m30s   v1.17.5
+node02   Ready    controlplane,etcd,worker   5m30s   v1.17.5
+node03   Ready    controlplane,etcd,worker   5m30s   v1.17.5
+```
+
+### SSH
+SSH access to the nodes is possible via the SSH key generated in the `deliverables/` directory. The username used will depend on which VM template was used to deploy the cluster. For ubuntu-based images, the username is `ubuntu`:
+```bash
+$ ssh -i ./deliverables/id_rsa ubuntu@<node IP address>
+```

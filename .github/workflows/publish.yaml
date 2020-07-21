@@ -12,6 +12,8 @@ jobs:
       - name: Get release version
         id: get_version
         run: echo ::set-env name=RELEASE_VERSION::$(git describe --tags --abbrev=0)
+      - name: Get GITHUB_REF
+        run: echo "${{ env.GITHUB_REF }}"
       - name: Get commit revision
         id: get_commit
         run: echo ::set-env name=GIT_COMMIT::$(git rev-parse HEAD)
@@ -23,5 +25,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASS }}
           registry: docker.io
           dockerfile: Dockerfile
-          buildargs: GIT_COMMIT="${{ env.GIT_COMMIT }}"
-          tags: "${{ env.GITHUB_REF }}"
+          buildargs: GIT_COMMIT=${{ env.GIT_COMMIT }}
+          tags: "latest, ${{ env.RELEASE_VERSION }}"
