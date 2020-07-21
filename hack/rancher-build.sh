@@ -27,6 +27,6 @@ PROJECT_DIR="$(
 
 cd $PROJECT_DIR
 echo "starting docker build process..."
-docker build --force-rm -t terraform-rancher:${IMAGE_TAG} --build-arg EZR_COMPRESS_BINARIES --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+docker build --force-rm -t ez-rancher:${IMAGE_TAG} --build-arg EZR_COMPRESS_BINARIES --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
 cd $CWD
 
