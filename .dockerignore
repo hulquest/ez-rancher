@@ -11,3 +11,4 @@ k8s
 .git
 
 !hack/compress_binaries.sh
+!hack/install_upx.sh

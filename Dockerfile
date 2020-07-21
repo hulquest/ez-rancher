@@ -2,7 +2,7 @@
 # docker run -it --rm -v ${PWD}/rancher.tfvars:/terraform/vsphere-rancher/rancher.tfvars -v ${PWD}/deliverables:/terraform/vsphere-rancher/deliverables terraform-rancher:latest apply -state=deliverables/terraform.tfstate
 FROM alpine:3.12.0
 
-ARG RELEASE_BUILD=false
+ARG EZR_COMPRESS_BINARIES=false
 ARG GIT_COMMIT=unspecified
 LABEL git_commit=$GIT_COMMIT
 
@@ -11,6 +11,7 @@ ENV RKE_PROVIDER_VERSION=1.0.1
 ENV TERRAFORM_VERSION=0.12.26
 
 COPY hack/compress_binaries.sh /compress_binaries.sh
+COPY hack/install_upx.sh /install_upx.sh
 
 RUN apk add --no-cache --virtual .build-deps curl \
   && curl -Lo /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
@@ -27,14 +28,15 @@ RUN apk add --no-cache --virtual .build-deps curl \
   && mv terraform /bin/terraform \
   && apk del --no-cache .build-deps \
   && rm -rf /tf-provider-rke.zip \
-  && if ${RELEASE_BUILD}; then /compress_binaries.sh; fi
+  && /install_upx.sh \
+  && if ${EZR_COMPRESS_BINARIES}; then /compress_binaries.sh; fi
 
 COPY terraform/ /terraform/
 
 WORKDIR /terraform/vsphere-rancher
 #ARG RELEASE_BUILD=false
 RUN terraform init \
-  && if ${RELEASE_BUILD}; then /compress_binaries.sh; fi \
-  && rm -rf /compress_binaries.sh
+  && if ${EZR_COMPRESS_BINARIES}; then /compress_binaries.sh; terraform init; fi \
+  && rm -rf /compress_binaries.sh /install_upx.sh /bin/upx
 
 ENTRYPOINT ["terraform"]

@@ -112,6 +112,14 @@ $ docker inspect ez-rancher:dev  | jq '.[].ContainerConfig.Labels'
 }
 ```
 
+A container image with an over 70% smaller size can be created by setting the environment variable `EZR_COMPRESS_BINARIES` to `true`. This will compress `terraform`, `kubectl` and all plugin binaries.
+
+```bash
+export EZR_COMPRESS_BINARIES=true; make build
+```
+
+NOTE - *Be advised that with `EZR_COMPRESS_BINARIES=true` the image build process is optimized for image size over build duration.*
+
 ## Pushing images to a container registry
 After building your image, you can also easily push it to your container
 registry using the Makefile.  By default, we set a container registry
