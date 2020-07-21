@@ -29,6 +29,10 @@ There are 2 ways to run EZ-Rancher:
 
 The `vm_template_name` must be a cloud-init OVA that is in your vCenter instance. We have tested this Ubuntu image: <https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.ova>
 
+#### VM datastore
+
+The `vm_datastore` must be set to a VMFS datastore to support disk resizing.
+
 ### Network
 
 Network connectivity from where terraform is executed to the `vm_network`. The `vm_network` must also have internet access.
@@ -49,33 +53,21 @@ For tfvars config file examples, refer to [tfvars examples](rancher.tfvars.examp
 
 `terraform apply` will create a `deliverables/` directory to save things like the kubeconfig, ssh keys, etc
 
-### Terraform CLI
-
-```bash
-# create cluster
-terraform apply -var-file=rancher.tfvars terraform/vsphere-rancher
-# remove cluster
-terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
-```
-
-### Docker
+### Docker (Recommended)
 
 We rely on environment variables for setting image tags, pointing to rancher variables files and providing
 a directory to put deployment output/deliverables in:
 
-* EZR_IMAGE_TAG (default is `dev`)
-* EZR_VARS_FILE (default is `./rancher.tfvars`) 
+* EZR_IMAGE_TAG (default is `latest`)
+* EZR_VARS_FILE (default is `./rancher.tfvars`)
 * EZR_DELIVERABLES_DIR (default is `./deliverables`, will attempt creation if it doesn't exist)
 
 ```bash
-make build
-
 # create cluster using default arguments
 make rancher-up
 
 # remove cluster using default arguments
 make rancher-destroy
-
 ```
 
 *NOTE*
@@ -83,6 +75,17 @@ make rancher-destroy
 The `make rancher-destroy` directive will not only tear down a cluster deployed with `make cluster-up` but it will
 also clean up/remove the deliverables files generated from that run.  As such, if for some reason you'd like to save
 files from a previous run you'll want to copy them to another location.
+
+### Terraform CLI
+
+```bash
+cd terraform/vsphere-rancher/
+terraform init
+# create cluster
+terraform apply -var-file=rancher.tfvars terraform/vsphere-rancher
+# remove cluster
+terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
+```
 
 ### Deliverables
 
@@ -98,30 +101,39 @@ Additionally, the `ssh_public_key` variable can optionally set an authorized_key
 
 ## Releases
 
-* [Releases will be published as container images in Github](https://github.com/NetApp/ez-rancher/packages)
+[Releases](https://github.com/NetApp/ez-rancher/releases) will be published as container images in [Docker Hub](https://hub.docker.com/r/netapp/ez-rancher/tags)
+
+Releases created in GitHub will generate ez-rancher images tagged with the release version in Docker Hub.
+Latest will point to the latest tagged release version. Commits to the main branch will not
+automatically publish a new image, but the image can be [created locally](#create-image).
 
 ```bash
-docker login docker.pkg.github.com -u <GITHUB_USER> -p <GITHUB_ACCESS_TOKEN>
-docker pull docker.pkg.github.com/netapp/ez-rancher/ez-rancher:latest
+docker pull netapp/ez-rancher:latest
 ```
 
 ## Creating container images
 
-You can use the `make build` command to easily build a ez-rancher
+You can use the `make build` command to easily build an ez-rancher
 container image with all the necessary dependencies.  This will be built
 based on the current status of your src directory.
 
-By default, we set an Image Tag of "dev" eg ez-rancher:dev.  You can
+By default, we set an Image Tag of "latest" eg ez-rancher:latest.  You can
 change this tag by setting the `EZR_IMAGE_TAG` environment variable to your
-desired tag (eg `latest` which we build and publish for each commit).
+desired tag.
+
+```bash
+export EZR_IMAGE_TAG=dev
+make build
+EZR_IMAGE_NAME=ez-rancher make rancher-up
+```
 
 When building container images, keep in mind that the `make build` option includes
-a helper script to gather the current git commit sha and sets a `git_commit` label 
+a helper script to gather the current git commit sha and sets a `git_commit` label
 on the image. This provides a mechanism to determine the current git state of tagged
 builds that are in use. You can access the label using docker inspect:
 
 ```bash
-$ docker inspect ez-rancher:dev  | jq '.[].ContainerConfig.Labels'
+$ docker inspect ez-rancher:latest  | jq '.[].ContainerConfig.Labels'
 {
   "git_commit": "1c35dae6ef81c0bd14439c100a4260f3bff4ccce"
 }
