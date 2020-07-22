@@ -20,7 +20,7 @@ EZR_IMAGE_TAG=${EZR_IMAGE_TAG:-latest}
 TFVARS=${EZR_VARS_FILE:-"${PWD}/rancher.tfvars"}
 DELIVERABLES=${EZR_DELIVERABLES_DIR:-"${PWD}/deliverables"}
 
-if [ ! -z ${ER_DEBUG} ] ; then
+if [ ! -z ${EZR_DEBUG} ] ; then
   set -x
 fi
 

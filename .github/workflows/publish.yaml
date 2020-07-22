@@ -25,5 +25,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASS }}
           registry: docker.io
           dockerfile: Dockerfile
-          buildargs: GIT_COMMIT=${{ env.GIT_COMMIT }}
+          buildargs: GIT_COMMIT=${{ env.GIT_COMMIT }},EZR_COMPRESS_BINARIES=true
           tags: "latest, ${{ env.RELEASE_VERSION }}"
