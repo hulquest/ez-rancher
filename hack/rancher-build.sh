@@ -16,8 +16,8 @@
 # Copyright 2020 NetApp
 #
 
-IMAGE_TAG=${IMAGE_TAG:-dev}
-echo "building container image using tag: '$IMAGE_TAG'";
+EZR_IMAGE_TAG=${EZR_IMAGE_TAG:-dev}
+echo "building container image using tag: '$EZR_IMAGE_TAG'";
 
 CWD=$PWD
 PROJECT_DIR="$(
@@ -27,6 +27,6 @@ PROJECT_DIR="$(
 
 cd $PROJECT_DIR
 echo "starting docker build process..."
-docker build -t ez-rancher:${IMAGE_TAG} --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+docker build --force-rm -t ez-rancher:${EZR_IMAGE_TAG} --build-arg EZR_COMPRESS_BINARIES --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
 cd $CWD
 

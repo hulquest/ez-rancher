@@ -15,12 +15,12 @@
 # Copyright 2020 NetApp
 #
 OPERATION=$1
-IMAGE_NAME=${IMAGE_NAME:-netapp/ez-rancher}
-IMAGE_TAG=${IMAGE_TAG:-latest}
-TFVARS=${ER_VARS_FILE:-"${PWD}/rancher.tfvars"}
-DELIVERABLES=${ER_DELIVERABLES_DIR:-"${PWD}/deliverables"}
+EZR_IMAGE_NAME=${EZR_IMAGE_NAME:-netapp/ez-rancher}
+EZR_IMAGE_TAG=${EZR_IMAGE_TAG:-latest}
+TFVARS=${EZR_VARS_FILE:-"${PWD}/rancher.tfvars"}
+DELIVERABLES=${EZR_DELIVERABLES_DIR:-"${PWD}/deliverables"}
 
-if [ ! -z ${ER_DEBUG} ] ; then
+if [ ! -z ${EZR_DEBUG} ] ; then
   set -x
 fi
 
@@ -48,10 +48,10 @@ if [ "$OPERATION" == "destroy" ]; then
   # This will allow any additional clusters that the user has created to be retained.
   docker run -it --rm -v "$TFVARS":/terraform/vsphere-rancher/rancher.tfvars \
       -v "$DELIVERABLES":/terraform/vsphere-rancher/deliverables \
-      ${IMAGE_NAME}:"$IMAGE_TAG" state rm module.rancher
+      ${EZR_IMAGE_NAME}:"$EZR_IMAGE_TAG" state rm module.rancher
   docker run -it --rm -v "$TFVARS":/terraform/vsphere-rancher/rancher.tfvars \
       -v "$DELIVERABLES":/terraform/vsphere-rancher/deliverables \
-      ${IMAGE_NAME}:"$IMAGE_TAG" "$OPERATION" -auto-approve \
+      ${EZR_IMAGE_NAME}:"$EZR_IMAGE_TAG" "$OPERATION" -auto-approve \
       -var-file=/terraform/vsphere-rancher/rancher.tfvars \
       -target=module.cluster_nodes.vsphere_virtual_machine.node
   echo "removing contents of deliverables directory..."
@@ -59,7 +59,7 @@ if [ "$OPERATION" == "destroy" ]; then
 else
   docker run -it --rm -v "$TFVARS":/terraform/vsphere-rancher/rancher.tfvars \
       -v "$DELIVERABLES":/terraform/vsphere-rancher/deliverables \
-      ${IMAGE_NAME}:"$IMAGE_TAG" "$OPERATION" -auto-approve \
+      ${EZR_IMAGE_NAME}:"$EZR_IMAGE_TAG" "$OPERATION" -auto-approve \
       -var-file=/terraform/vsphere-rancher/rancher.tfvars
 fi
  
