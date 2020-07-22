@@ -85,8 +85,7 @@ files from a previous run you'll want to copy them to another location.
 ### Terraform CLI
 
 ```bash
-cd terraform/vsphere-rancher/
-terraform init
+terraform init terraform/vsphere-rancher
 # create cluster
 terraform apply -var-file=rancher.tfvars terraform/vsphere-rancher
 # remove cluster
