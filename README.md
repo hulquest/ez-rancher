@@ -41,7 +41,7 @@ The `vm_datacenter` should be set to the vSphere DataCenter that has access to t
 
 The `vsphere_resource_pool` can be the name of a vSphere ResourcePool or Cluster.  If using a Cluster, then be sure to add "/Resources" after the name of the Cluster, like `gpu_cluster/Resources`.  The default value for this parameter is `Resources` which works fine for data centers that have a single cluster.
 
-#### Data Store
+#### DataStore
 
 The `vm_datastore` is the vSphere DataStore that will provide storage for the VMs that will compose Rancher Server. It must be set to a VMFS DataStore to support disk resizing.
 
@@ -55,7 +55,7 @@ The `rancher_server_url` input must resolve to one or more of the worker node IP
 
 If DHCP is used (default), this can be done after the deployment completes and the worker nodes receive an IP from the `vm_network`.
 
-#### Auto DNS URL (DHCP)
+#### Auto DNS URL
 
 If the `use_auto_dns_url` parameter is set to `true`, then the `rancher_server_url` will be automatically set to the following URL:
 
@@ -110,7 +110,7 @@ Download the `runner.zip` package from our [Releases](https://github.com/NetApp/
 * Unzip the artifact.
 * Copy `rancher.tfvars.example` to `rancher.tfvars`
 * Tune `rancher.tfvars` for your environment.
-* Run `./runner.sh` to install Rancher Server
+* Run `./runner.sh apply` to install Rancher Server
 * Optionally run `./runner.sh destroy` to remove Rancher Server.  _All downstream clusters will not be disturbed by this action._
 
 ### Deliverables
@@ -215,7 +215,7 @@ In order to access the Rancher UI via your chosen `rancher_server_url`, you must
 
 Once the DNS record is in place, the Rancher UI will become accessible at the location specified for `rancher_server_url`.
 
-### Automatic DNS Names (DHCP)
+### Automatic DNS Names
 
 If you have not yet configured DNS, the Rancher UI can also be accessed via the following URL syntax, using the IP address of any node in the cluster:
 
