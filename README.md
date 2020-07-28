@@ -2,7 +2,7 @@
 
 ----
 
-EZ Rancher is Infrastructure as Code to deploy Rancher server on vSphere. It creates the VM infrastructure and configures [Rancher server](https://rancher.com/docs/rancher/v2.x/en/overview/).
+EZ Rancher is Infrastructure as Code to deploy Rancher server on vSphere. It creates the VM infrastructure and configures [Rancher server](https://rancher.com/docs/rancher/v2.x/en/overview/) and will optionally create a Rancher user cluster.
 
 ----
 
@@ -22,18 +22,28 @@ There are 2 ways to run EZ-Rancher:
     * [Kubectl](https://downloadkubernetes.com/)
     * [Terraform RKE plugin](https://github.com/rancher/terraform-provider-rke)
     * netcat
-    
+
 (We recommend you check the CVE for the above tools and only use versions without security issues)
 
 ### vSphere
+
+The following parameters specify how Rancher will be deployed within your vSphere environment.
 
 #### VM template
 
 The `vm_template_name` must be a cloud-init OVA that is in your vCenter instance. We have tested this Ubuntu image: <https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.ova>
 
-#### VM datastore
+#### Data Center
 
-The `vm_datastore` must be set to a VMFS datastore to support disk resizing.
+The `vm_datacenter` should be set to the vSphere DataCenter that has access to the remaining vSphere parameters.
+
+#### Resource Pool
+
+The `vsphere_resource_pool` can be the name of a vSphere ResourcePool or Cluster.  If using a Cluster, then be sure to add "/Resources" after the name of the Cluster, like `gpu_cluster/Resources`.  The default value for this parameter is `Resources` which works fine for data centers that have a single cluster.
+
+#### DataStore
+
+The `vm_datastore` is the vSphere DataStore that will provide storage for the VMs that will compose Rancher Server. It must be set to a VMFS DataStore to support disk resizing.
 
 ### Network
 
@@ -59,7 +69,7 @@ This URL allow you to start using Rancher right away, eliminating the need to co
 
 For tfvars config file examples, refer to [tfvars examples](rancher.tfvars.example)
 
-`terraform apply` will create a `deliverables/` directory to save things like the kubeconfig, ssh keys, etc
+`terraform apply` will create a `deliverables/` directory to save things like the kubeconfig, ssh keys, etc...  
 
 ### Docker (Recommended)
 
@@ -78,9 +88,7 @@ make rancher-up
 make rancher-destroy
 ```
 
-*NOTE*
-
-The `make rancher-destroy` directive will not only tear down a cluster deployed with `make cluster-up` but it will
+> The `make rancher-destroy` directive will not only tear down a cluster deployed with `make rancher-up` but it will
 also clean up/remove the deliverables files generated from that run.  As such, if for some reason you'd like to save
 files from a previous run you'll want to copy them to another location.
 
@@ -94,9 +102,20 @@ terraform apply -var-file=rancher.tfvars terraform/vsphere-rancher
 terraform destroy -var-file=rancher.tfvars terraform/vsphere-rancher
 ```
 
+### Runner Script
+
+Download the `runner.zip` package from our [Releases](https://github.com/NetApp/ez-rancher/releases) page to run the installation from a shell script;  Docker remains a prerequisite.
+
+* Select the release (the most recent is recommended) and `wget https://github.com/NetApp/ez-rancher/releases/_release_/runner.zip`
+* Unzip the artifact.
+* Copy `rancher.tfvars.example` to `rancher.tfvars`
+* Tune `rancher.tfvars` for your environment.
+* Run `./runner.sh apply` to install Rancher Server
+* Optionally run `./runner.sh destroy` to remove Rancher Server.  _All downstream clusters will not be disturbed by this action._
+
 ### Deliverables
 
-ez-rancher will create several files based on the `deliverables_path` variable to save things like the kubeconfig, ssh keys, etc
+Every method to run ez-rancher will create several files based on the `deliverables_path` variable to save things like the kubeconfig, ssh keys, etc
 
 * See [Admin Access to Cluster Nodes](#admin-access-to-cluster-nodes) for more details.
 
@@ -118,7 +137,7 @@ automatically publish a new image, but the image can be [created locally](#creat
 docker pull netapp/ez-rancher:latest
 ```
 
-## Creating container images
+## Creating Container Images
 
 You can use the `make build` command to easily build an ez-rancher
 container image with all the necessary dependencies.  This will be built
@@ -152,9 +171,9 @@ A container image over 70% smaller can be created by setting the environment var
 export EZR_COMPRESS_BINARIES=true; make build
 ```
 
-NOTE - *Be advised that with `EZR_COMPRESS_BINARIES=true` the image build process is optimized for image size over build duration.*
+> *Be advised that with `EZR_COMPRESS_BINARIES=true` the image build process is optimized for image size over build duration.*
 
-## Pushing images to a container registry
+## Pushing Images to a Container Registry
 
 After building your image, you can also easily push it to your container
 registry using the Makefile.  By default, we set a container registry
@@ -190,7 +209,7 @@ cluster_nodes = [
 rancher_server_url = https://<Your Rancher URL>
 ```
 
-## Accessing the Rancher UI
+## Accessing Rancher UI
 
 In order to access the Rancher UI via your chosen `rancher_server_url`, you must ensure that a valid DNS record exists, that resolves to one or more of your cluster node IPs.
 
@@ -204,7 +223,7 @@ If you have not yet configured DNS, the Rancher UI can also be accessed via the 
 https://<IP of node>.nip.io
 ```
 
-*note: A valid DNS record must be in place for the `rancher_server_url` before Rancher will become fully functional. To eliminate this DNS requirement, see [Auto DNS URL](#auto-dns-url)*
+> A valid DNS record must be in place for the `rancher_server_url` before Rancher will become fully functional. To eliminate this DNS requirement, see [Auto DNS URL](#auto-dns-url)*
 
 ## Admin Access to Cluster Nodes
 
