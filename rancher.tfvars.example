@@ -54,7 +54,10 @@ vm_network = "network1"
 # (Optional) vSphere VM Folder. Defaults to top level vSphere ie no folder
 vsphere_vm_folder = "your/folder"
 
-# (Optional) vSphere Resource Pool where all VMs will be placed. Defaults to no resource pool
+# (Conditionally optional) vSphere Resource Pool where all VMs will be placed. 
+# Default: Resources
+# Note: The default value works for DataCenters with a single Cluster. Otherwise, enter "<cluster_name>/Resources".
+#       The easiest option is to enter the name of a pre-configured ResourcePool.   
 vsphere_resource_pool = "mypool"
 
 # ===================== #

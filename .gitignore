@@ -18,5 +18,5 @@ crash.log
 # For built boxes
 *.box
 
-deliverables
+deliverables*/
 .idea
