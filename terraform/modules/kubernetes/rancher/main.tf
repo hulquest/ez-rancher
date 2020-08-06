@@ -59,6 +59,7 @@ resource "helm_release" "cert-manager" {
   namespace        = "cert-manager"
   create_namespace = "true"
   wait             = "true"
+  replace          = true
 
   set {
     name  = "namespace"
@@ -84,6 +85,7 @@ resource "helm_release" "rancher" {
   namespace        = "cattle-system"
   create_namespace = "true"
   wait             = "true"
+  replace          = true
 
   set {
     name  = "namespace"
