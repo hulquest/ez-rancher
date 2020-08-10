@@ -24,6 +24,7 @@ data "vsphere_resource_pool" "pool" {
 
 locals {
   num_addresses = length(var.static_ip_addresses)
+  proxy_set     = var.http_proxy != "" && var.https_proxy != "" ? true : false
 }
 
 data "template_file" "metadata" {
@@ -35,13 +36,16 @@ data "template_file" "metadata" {
   }
 }
 
-data "template_file" "userdata" {
+data "template_file" "kickstart_userdata" {
   count    = var.node_count
   template = file("${path.module}/cloudinit/kickstart-userdata.yaml")
   vars = {
     ssh_public_key          = tls_private_key.key.public_key_openssh
     admin_access_public_key = var.ssh_public_key
     netplan                 = base64encode(data.template_file.netplan[count.index].rendered)
+    env_proxy               = local.proxy_set ? format("export http_proxy=%s https_proxy=%s no_proxy=%s", var.http_proxy, var.https_proxy, var.no_proxy) : "echo"
+    docker_proxy = local.proxy_set ? base64encode(format(
+    "[Service]\nEnvironment=\"HTTP_PROXY=%s\"\nEnvironment=\"HTTPS_PROXY=%s\"\nEnvironment=\"NO_PROXY=%s\"", var.http_proxy, var.https_proxy, var.no_proxy)) : ""
   }
 }
 
@@ -53,5 +57,12 @@ data "template_file" "netplan" {
     dns_servers  = format("%s [%s]", "addresses:", join(",", var.dns_servers))
     addresses    = local.num_addresses > 0 ? format("%s %s", "addresses:", jsonencode([var.static_ip_addresses[count.index]])) : ""
     gateway      = var.default_gateway != "" ? format("%s %s", "gateway4:", var.default_gateway) : ""
+  }
+}
+
+data "template_file" "userdata" {
+  template = file("${path.module}/cloudinit/userdata.yaml")
+  vars = {
+    env_proxy = local.proxy_set ? format("export http_proxy=%s https_proxy=%s no_proxy=%s", var.http_proxy, var.https_proxy, var.no_proxy) : "echo"
   }
 }

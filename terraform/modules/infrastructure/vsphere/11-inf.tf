@@ -34,13 +34,13 @@ resource "vsphere_virtual_machine" "node" {
   vapp {
     properties = {
       hostname  = format("${var.vm_name}-${var.type}%02d", count.index + 1)
-      user-data = base64encode(data.template_file.userdata[count.index].rendered)
+      user-data = base64encode(data.template_file.kickstart_userdata[count.index].rendered)
     }
   }
   extra_config = {
     "guestinfo.metadata"          = base64encode(data.template_file.metadata[count.index].rendered)
     "guestinfo.metadata.encoding" = "base64"
-    "guestinfo.userdata"          = base64encode(file("${path.module}/cloudinit/userdata.yaml"))
+    "guestinfo.userdata"          = base64encode(data.template_file.userdata.rendered)
     "guestinfo.userdata.encoding" = "base64"
   }
   provisioner "local-exec" {

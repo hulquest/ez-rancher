@@ -112,3 +112,18 @@ variable "ssh_public_key" {
   description = "SSH public key"
   default     = ""
 }
+
+variable "http_proxy" {
+  type    = string
+  default = ""
+}
+
+variable "https_proxy" {
+  type    = string
+  default = ""
+}
+
+variable "no_proxy" {
+  type    = string
+  default = ""
+}

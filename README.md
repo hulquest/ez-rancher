@@ -65,6 +65,10 @@ https://<IP of primary node>.nip.io
 
 This URL allow you to start using Rancher right away, eliminating the need to configure DNS manually.
 
+#### Proxy
+
+If using an HTTP/HTTPS proxy server to access the internet, please set both the `http_proxy` and `https_proxy` variables.
+
 ## Getting Started
 
 For tfvars config file examples, refer to [tfvars examples](rancher.tfvars.example)

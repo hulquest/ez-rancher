@@ -27,6 +27,9 @@ module "cluster_nodes" {
   default_gateway        = var.default_gateway
   dns_servers            = var.dns_servers
   ssh_public_key         = var.ssh_public_key
+  http_proxy             = var.http_proxy
+  https_proxy            = var.https_proxy
+  no_proxy               = var.no_proxy
 }
 
 module "rancher" {
