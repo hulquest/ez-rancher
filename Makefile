@@ -5,11 +5,10 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: build 
-build:  ## Build container image (set $EZR_IMAGE_TAG or use default of `dev`)
+build:  ## Build container image (set $EZR_IMAGE_TAG or use default of `latest`)
 	EZR_IMAGE_TAG=${EZR_IMAGE_TAG} hack/rancher-build.sh
 
 .PHONY: push-latest-image
-push-latest-image: export EZR_IMAGE_TAG := latest ## Push a container image with the latest tag
 push-latest-image: build push
 
 .PHONY: push
