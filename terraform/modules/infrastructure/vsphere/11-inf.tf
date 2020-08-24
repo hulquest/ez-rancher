@@ -1,4 +1,12 @@
 
+terraform {
+  required_providers {
+    vsphere = {
+      source = "hashicorp/vsphere"
+    }
+  }
+}
+
 resource "tls_private_key" "key" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P384"

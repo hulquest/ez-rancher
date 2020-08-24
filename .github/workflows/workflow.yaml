@@ -32,14 +32,13 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 0.12.26
+          terraform_version: 0.13.0
 
       - name: Terraform Format
         run: terraform fmt -check -recursive -diff .
 
       - name: Terraform Init
         run: |
-          ../../hack/gh_actions_install_rke_provider.sh
           terraform init
         working-directory: ./terraform/vsphere-rancher
 

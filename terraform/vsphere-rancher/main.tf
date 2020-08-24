@@ -1,8 +1,15 @@
 terraform {
-  required_version = ">= 0.12.0"
+  required_version = ">= 0.13.0"
   backend "local" {
     path = "./deliverables/terraform.tfstate"
   }
+}
+
+provider "vsphere" {
+  user                 = var.vsphere_user
+  password             = var.vsphere_password
+  vsphere_server       = var.vsphere_vcenter
+  allow_unverified_ssl = var.vsphere_unverified_ssl
 }
 
 module "cluster_nodes" {

@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    helm = {
+      source = "hashicorp/helm"
+    }
+    rke = {
+      source = "rancher/rke"
+    }
+    rancher2 = {
+      source = "rancher/rancher2"
+    }
+  }
+}
+
 locals {
   deliverables_path  = var.deliverables_path == "" ? "./deliverables" : var.deliverables_path
   alias_initial_node = var.rancher_server_url == join("", [var.cluster_nodes[0].ip, ".nip.io"]) ? 1 : 0
@@ -50,7 +64,6 @@ resource "local_file" "ssh_public_key" {
 }
 
 provider "helm" {
-  version = "1.2.2"
   kubernetes {
     config_path = format("${local.deliverables_path}/kubeconfig")
   }
@@ -82,8 +95,14 @@ resource "helm_release" "cert-manager" {
   }
 }
 
+resource "time_sleep" "wait_for_cert_manager" {
+  depends_on = [helm_release.cert-manager]
+
+  create_duration = "30s"
+}
+
 resource "helm_release" "rancher" {
-  depends_on       = [helm_release.cert-manager]
+  depends_on       = [helm_release.cert-manager, time_sleep.wait_for_cert_manager]
   name             = "rancher"
   chart            = "rancher"
   repository       = "https://releases.rancher.com/server-charts/stable"
