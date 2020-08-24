@@ -42,7 +42,7 @@ resource "local_file" "kubeconfig" {
 }
 
 resource "local_file" "rkeconfig" {
-  filename = format("${local.deliverables_path}/rkecluster.yaml")
+  filename = format("${local.deliverables_path}/cluster.yml")
   content  = rke_cluster.cluster.rke_cluster_yaml
 }
 
