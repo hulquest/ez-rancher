@@ -134,3 +134,11 @@ resource "local_file" "rancher_api_key" {
   filename = format("${local.deliverables_path}/rancher_token")
   content  = rancher2_bootstrap.admin[0].token
 }
+
+resource "rancher2_catalog" "trident" {
+  provider = rancher2.admin
+
+  name = "trident"
+  url = "https://raw.githubusercontent.com/sgryczan/TridentInstaller/master/chart"
+  version = "helm_v3"
+}
