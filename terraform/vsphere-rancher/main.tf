@@ -57,10 +57,11 @@ module "rancher" {
   rancher_vsphere_server   = var.vsphere_vcenter
   rancher_vsphere_port     = 443
 
-  rancher_vsphere_datacenter = var.vsphere_datacenter
-  rancher_vsphere_datastore  = var.vm_datastore
-  rancher_vsphere_folder     = var.vsphere_vm_folder
-  rancher_vsphere_network    = var.vm_network
-  rancher_vsphere_pool       = var.vsphere_resource_pool
-  bootstrap_rancher          = var.bootstrap_rancher
+  rancher_vsphere_datacenter   = var.vsphere_datacenter
+  rancher_vsphere_datastore    = var.vm_datastore
+  rancher_vsphere_folder       = var.vsphere_vm_folder
+  rancher_vsphere_network      = var.vm_network
+  rancher_vsphere_pool         = var.vsphere_resource_pool
+  rancher_create_node_template = var.rancher_create_node_template
+  rancher_node_template_name   = var.rancher_node_template_name
 }

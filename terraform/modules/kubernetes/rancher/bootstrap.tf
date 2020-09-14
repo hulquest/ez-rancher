@@ -1,5 +1,5 @@
 resource "null_resource" "wait_for_rancher" {
-  count = var.bootstrap_rancher ? 1 : 0
+  count = var.rancher_create_node_template ? 1 : 0
 
   depends_on = [helm_release.rancher]
   provisioner "local-exec" {
@@ -16,7 +16,7 @@ provider "rancher2" {
 }
 
 resource "rancher2_bootstrap" "admin" {
-  count = var.bootstrap_rancher ? 1 : 0
+  count = var.rancher_create_node_template ? 1 : 0
 
   provider   = rancher2.bootstrap
   depends_on = [null_resource.wait_for_rancher[0]]
@@ -28,8 +28,8 @@ resource "rancher2_bootstrap" "admin" {
 provider "rancher2" {
   alias = "admin"
 
-  api_url   = var.bootstrap_rancher ? rancher2_bootstrap.admin[0].url : ""
-  token_key = var.bootstrap_rancher ? rancher2_bootstrap.admin[0].token : ""
+  api_url   = var.rancher_create_node_template ? rancher2_bootstrap.admin[0].url : ""
+  token_key = var.rancher_create_node_template ? rancher2_bootstrap.admin[0].token : ""
   insecure  = true
 }
 
@@ -38,7 +38,7 @@ data "dns_a_record_set" "vcenter" {
 }
 
 resource "rancher2_cloud_credential" "vsphere" {
-  count = var.bootstrap_rancher ? 1 : 0
+  count = var.rancher_create_node_template ? 1 : 0
 
   provider    = rancher2.admin
   name        = "vsphere"
@@ -52,7 +52,7 @@ resource "rancher2_cloud_credential" "vsphere" {
 }
 
 resource "rancher2_setting" "server_url" {
-  count      = var.bootstrap_rancher ? 1 : 0
+  count      = var.rancher_create_node_template ? 1 : 0
   provider   = rancher2.admin
   depends_on = [rancher2_node_template.vsphere]
 
@@ -61,9 +61,9 @@ resource "rancher2_setting" "server_url" {
 }
 
 resource "rancher2_node_template" "vsphere" {
-  count = var.bootstrap_rancher ? 1 : 0
+  count = var.rancher_create_node_template ? 1 : 0
 
-  name     = "default-vsphere"
+  name     = var.rancher_node_template_name
   provider = rancher2.admin
 
   description         = "vsphere"
@@ -81,7 +81,7 @@ resource "rancher2_node_template" "vsphere" {
 }
 
 resource "rancher2_cluster" "cluster" {
-  count    = var.create_user_cluster && var.bootstrap_rancher ? 1 : 0
+  count    = var.create_user_cluster && var.rancher_create_node_template ? 1 : 0
   name     = var.user_cluster_name
   provider = rancher2.admin
 
@@ -94,7 +94,7 @@ resource "rancher2_cluster" "cluster" {
 }
 
 resource "rancher2_node_pool" "control_plane" {
-  count = var.create_user_cluster && var.bootstrap_rancher ? 1 : 0
+  count = var.create_user_cluster && var.rancher_create_node_template ? 1 : 0
 
   cluster_id       = rancher2_cluster.cluster[0].id
   provider         = rancher2.admin
@@ -108,7 +108,7 @@ resource "rancher2_node_pool" "control_plane" {
 }
 
 resource "rancher2_node_pool" "worker" {
-  count = var.create_user_cluster && var.bootstrap_rancher ? 1 : 0
+  count = var.create_user_cluster && var.rancher_create_node_template ? 1 : 0
 
   cluster_id       = rancher2_cluster.cluster[0].id
   provider         = rancher2.admin
@@ -122,14 +122,14 @@ resource "rancher2_node_pool" "worker" {
 }
 
 resource "local_file" "kubeconfig_user" {
-  count = var.create_user_cluster && var.bootstrap_rancher ? 1 : 0
+  count = var.create_user_cluster && var.rancher_create_node_template ? 1 : 0
 
   filename = format("${local.deliverables_path}/kubeconfig_user")
   content  = rancher2_cluster.cluster[0].kube_config
 }
 
 resource "local_file" "rancher_api_key" {
-  count = var.bootstrap_rancher ? 1 : 0
+  count = var.rancher_create_node_template ? 1 : 0
 
   filename = format("${local.deliverables_path}/rancher_token")
   content  = rancher2_bootstrap.admin[0].token

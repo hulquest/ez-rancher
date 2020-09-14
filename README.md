@@ -139,6 +139,13 @@ ez-rancher will generate an SSH key pair for RKE node communication. The generat
 
 Additionally, the `ssh_public_key` variable can optionally set an authorized_key on each node for admin access.
 
+#### Node Template and User Cluster
+
+ez-rancher can provision a node template and a sample user cluster.  Use the `rancher_create_node_template` variable to create the node template for the vCenter values provided.  The `rancher_node_template_name` parameter can be used to customize the name so it is familiar to your organization.
+
+Then use `rancher_create_user_cluster` to provision a 3 node user cluster that can be immediately used.  The node template is a prerequisite to create a user cluster.  Therefore `rancher_create_node_template` must be enabled to provision a user cluster.
+> By creating a node template or user cluster, you are also accepting the [Rancher EULA](https://rancher.com/eula).
+
 ## Releases
 
 [Releases](https://github.com/NetApp/ez-rancher/releases) will be published as container images in [Docker Hub](https://hub.docker.com/r/netapp/ez-rancher/tags)

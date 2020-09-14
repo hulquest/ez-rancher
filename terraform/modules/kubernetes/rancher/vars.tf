@@ -35,9 +35,14 @@ variable "cluster_nodes" {
   default = []
 }
 
-variable "bootstrap_rancher" {
+variable "rancher_create_node_template" {
   type    = bool
   default = false
+}
+
+variable "rancher_node_template_name" {
+  type    = string
+  default = "vsphere-default"
 }
 
 variable "create_user_cluster" {
