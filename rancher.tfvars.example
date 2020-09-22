@@ -75,10 +75,10 @@ vm_network = "network1"
 # - Enables telemetry 
 # - Creates cloud credentials for vCenter
 # - Creates node template for vCenter
-# - Set the password for the admin user
 # rancher_create_node_template = true
 
-# rancher default admin password
+# (Conditionally optional) rancher default admin password 
+# Note: The value is used only when rancher_create_node_template=true
 rancher_password = "rancher"
 
 # (Optional) Name the node template so it is familiar to your users. Requires rancher_create_node_template.
