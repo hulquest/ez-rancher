@@ -70,17 +70,21 @@ vm_network = "network1"
 # (Optional) Automatically set rancher_server_url URL to <node ip>.nip.io
 # use_auto_dns_url = false
 
-# (Optional) Automatically configure rancher:
+# (Optional) Automatically configure rancher node template:
 # - Updates the default admin password, provided by the rancher_password variable.
 # - Enables telemetry 
 # - Creates cloud credentials for vCenter
 # - Creates node template for vCenter
-# bootstrap_rancher = true
+# rancher_create_node_template = true
 
-# rancher default admin password
-rancher_password = "solidfire"
+# (Conditionally optional) rancher default admin password 
+# Note: The value is used only when rancher_create_node_template=true
+rancher_password = "rancher"
 
-# (Optional) Create a default user cluster. Requires bootstrap_rancher.
+# (Optional) Name the node template so it is familiar to your users. Requires rancher_create_node_template.
+# rancher_node_template_name = "vsphere-default"
+
+# (Optional) Create a default user cluster. Requires rancher_create_node_template.
 # rancher_create_user_cluster = false
 
 # (Optional) Default user cluster name

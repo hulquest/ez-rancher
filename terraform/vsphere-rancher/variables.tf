@@ -140,9 +140,14 @@ variable "rancher_user_cluster_memoryMB" {
   default = 6144
 }
 
-variable "bootstrap_rancher" {
-  type    = string
+variable "rancher_create_node_template" {
+  type    = bool
   default = true
+}
+
+variable "rancher_node_template_name" {
+  type    = string
+  default = "vsphere-default"
 }
 
 variable "use_auto_dns_url" {
