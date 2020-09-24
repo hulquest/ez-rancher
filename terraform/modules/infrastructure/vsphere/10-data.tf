@@ -43,9 +43,9 @@ data "template_file" "kickstart_userdata" {
     ssh_public_key          = tls_private_key.key.public_key_openssh
     admin_access_public_key = var.ssh_public_key
     netplan                 = base64encode(data.template_file.netplan[count.index].rendered)
-    env_proxy               = local.proxy_set ? format("export http_proxy=%s https_proxy=%s no_proxy=%s", var.http_proxy, var.https_proxy, var.no_proxy) : "echo"
+    env_proxy               = local.proxy_set ? format("export http_proxy=%s https_proxy=%s", var.http_proxy, var.https_proxy) : "echo"
     docker_proxy = local.proxy_set ? base64encode(format(
-    "[Service]\nEnvironment=\"HTTP_PROXY=%s\"\nEnvironment=\"HTTPS_PROXY=%s\"\nEnvironment=\"NO_PROXY=%s\"", var.http_proxy, var.https_proxy, var.no_proxy)) : ""
+    "[Service]\nEnvironment=\"HTTP_PROXY=%s\"\nEnvironment=\"HTTPS_PROXY=%s\"", var.http_proxy, var.https_proxy)) : ""
   }
 }
 
@@ -63,6 +63,6 @@ data "template_file" "netplan" {
 data "template_file" "userdata" {
   template = file("${path.module}/cloudinit/userdata.yaml")
   vars = {
-    env_proxy = local.proxy_set ? format("export http_proxy=%s https_proxy=%s no_proxy=%s", var.http_proxy, var.https_proxy, var.no_proxy) : "echo"
+    env_proxy = local.proxy_set ? format("export http_proxy=%s https_proxy=%s", var.http_proxy, var.https_proxy) : "echo"
   }
 }

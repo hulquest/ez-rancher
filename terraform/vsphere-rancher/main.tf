@@ -64,4 +64,8 @@ module "rancher" {
   rancher_vsphere_pool         = var.vsphere_resource_pool
   rancher_create_node_template = var.rancher_create_node_template
   rancher_node_template_name   = var.rancher_node_template_name
+  http_proxy                   = var.http_proxy
+  no_proxy                     = var.no_proxy
+  rancher_cluster_cidr         = var.rancher_cluster_cidr
+  rancher_service_cidr         = var.rancher_service_cidr
 }
