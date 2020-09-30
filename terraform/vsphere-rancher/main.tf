@@ -47,6 +47,7 @@ module "rancher" {
   rancher_server_url = var.use_auto_dns_url ? join("", [module.cluster_nodes.nodes[0].ip, ".nip.io"]) : var.rancher_server_url
   ssh_private_key    = module.cluster_nodes.ssh_private_key
   ssh_public_key     = module.cluster_nodes.ssh_public_key
+  deliverables_path  = var.deliverables_path
 
   rancher_password    = var.rancher_password
   create_user_cluster = var.rancher_create_user_cluster

@@ -111,7 +111,7 @@ variable "default_gateway" {
 variable "deliverables_path" {
   type        = string
   description = "Path to deliverables directory"
-  default     = ""
+  default     = "./deliverables"
 }
 
 variable "dns_servers" {

@@ -13,7 +13,6 @@ terraform {
 }
 
 locals {
-  deliverables_path  = var.deliverables_path == "" ? "./deliverables" : var.deliverables_path
   alias_initial_node = var.rancher_server_url == join("", [var.cluster_nodes[0].ip, ".nip.io"]) ? 1 : 0
 }
 
@@ -46,35 +45,35 @@ resource "rke_cluster" "cluster" {
 }
 
 resource "local_file" "kubeconfig" {
-  filename = format("${local.deliverables_path}/kubeconfig")
+  filename = format("${var.deliverables_path}/kubeconfig")
   content  = rke_cluster.cluster.kube_config_yaml
 }
 
 resource "local_file" "rkeconfig" {
-  filename = format("${local.deliverables_path}/cluster.yml")
+  filename = format("${var.deliverables_path}/cluster.yml")
   content  = rke_cluster.cluster.rke_cluster_yaml
 }
 
 resource "local_file" "rke_state_file" {
-  filename = format("${local.deliverables_path}/cluster.rkestate")
+  filename = format("${var.deliverables_path}/cluster.rkestate")
   content  = rke_cluster.cluster.rke_state
 }
 
 resource "local_file" "ssh_private_key" {
-  filename        = format("${local.deliverables_path}/id_rsa")
+  filename        = format("${var.deliverables_path}/id_rsa")
   content         = var.ssh_private_key
   file_permission = "600"
 }
 
 resource "local_file" "ssh_public_key" {
-  filename        = format("${local.deliverables_path}/id_rsa.pub")
+  filename        = format("${var.deliverables_path}/id_rsa.pub")
   content         = var.ssh_public_key
   file_permission = "644"
 }
 
 provider "helm" {
   kubernetes {
-    config_path = format("${local.deliverables_path}/kubeconfig")
+    config_path = format("${var.deliverables_path}/kubeconfig")
   }
 }
 
