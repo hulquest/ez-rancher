@@ -70,6 +70,12 @@ vm_network = "network1"
 # (Optional) Automatically set rancher_server_url URL to <node ip>.nip.io
 # use_auto_dns_url = false
 
+# (Optional) Install a catalog with Trident.  This will allow administrators of 
+# downstream clusters to configure persistent storage for NetApp storage systems.  
+# See https://github.com/NetApp/trident for details about Trident.
+# See https://github.com/NetApp/TridentInstaller for details about how to configure the Trident chart.
+# rancher_create_trident_catalog = true
+
 # (Optional) Automatically configure rancher node template:
 # - Updates the default admin password, provided by the rancher_password variable.
 # - Enables telemetry 
