@@ -140,6 +140,11 @@ variable "rancher_user_cluster_memoryMB" {
   default = 6144
 }
 
+variable "rancher_create_trident_catalog" {
+  type    = bool
+  default = true
+}
+
 variable "rancher_create_node_template" {
   type    = bool
   default = true

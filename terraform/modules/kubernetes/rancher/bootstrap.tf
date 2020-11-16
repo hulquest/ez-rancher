@@ -134,3 +134,12 @@ resource "local_file" "rancher_api_key" {
   filename = format("${var.deliverables_path}/rancher_token")
   content  = rancher2_bootstrap.admin[0].token
 }
+
+resource "rancher2_catalog" "trident" {
+  count    = var.rancher_create_trident_catalog ? 1 : 0
+  provider = rancher2.admin
+
+  name    = "netapp-trident"
+  url     = "https://raw.githubusercontent.com/NetApp/ez-rancher-trident-installer/master/chart"
+  version = "helm_v3"
+}
