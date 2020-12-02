@@ -14,7 +14,7 @@
 #
 # Copyright 2020 NetApp
 #
-OPERATION=$1
+OPERATION=${1:-apply}
 EZR_IMAGE_NAME=${EZR_IMAGE_NAME:-netapp/ez-rancher}
 EZR_IMAGE_TAG=${EZR_IMAGE_TAG:-latest}
 TFVARS=${EZR_VARS_FILE:-"${PWD}/rancher.tfvars"}
