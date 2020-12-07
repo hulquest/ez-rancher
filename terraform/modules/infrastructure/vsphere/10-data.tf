@@ -46,6 +46,7 @@ data "template_file" "kickstart_userdata" {
     env_proxy               = local.proxy_set ? format("export http_proxy=%s https_proxy=%s", var.http_proxy, var.https_proxy) : "echo"
     docker_proxy = local.proxy_set ? base64encode(format(
     "[Service]\nEnvironment=\"HTTP_PROXY=%s\"\nEnvironment=\"HTTPS_PROXY=%s\"", var.http_proxy, var.https_proxy)) : ""
+    vmware_guestinfo_ver = var.cloud_init_vmware_guestinfo_version
   }
 }
 
@@ -63,6 +64,7 @@ data "template_file" "netplan" {
 data "template_file" "userdata" {
   template = file("${path.module}/cloudinit/userdata.yaml")
   vars = {
-    env_proxy = local.proxy_set ? format("export http_proxy=%s https_proxy=%s", var.http_proxy, var.https_proxy) : "echo"
+    env_proxy      = local.proxy_set ? format("export http_proxy=%s https_proxy=%s", var.http_proxy, var.https_proxy) : "echo"
+    docker_version = var.docker_version
   }
 }
