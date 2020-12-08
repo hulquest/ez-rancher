@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual .build-deps curl \
   && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
   && rm -rf terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
   && mv terraform /bin/terraform \
-  && curl -Lo /bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64 \
+  && curl -Lo /bin/terragrunt https://github.com/NetApp/terragrunt/releases/download/v0.26.7-netapp/terragrunt-linux-amd64 \
   && chmod +x /bin/terragrunt \
   && apk del --no-cache .build-deps
 
