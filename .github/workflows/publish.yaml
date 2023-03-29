@@ -18,7 +18,7 @@ jobs:
         id: get_commit
         run: echo "GIT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: netapp/ez-rancher
           username: ${{ secrets.DOCKERHUB_USER }}
